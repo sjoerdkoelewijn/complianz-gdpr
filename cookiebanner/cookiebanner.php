@@ -304,6 +304,9 @@ add_action('add_meta_boxes', 'cmplz_add_hide_cookiebanner_meta_box');
  */
 
 function cmplz_hide_cookiebanner_metabox(){
+    
+	if ( !cmplz_user_can_manage() ) return;
+
 	wp_nonce_field('cmplz_cookiebanner_hide_nonce', 'cmplz_cookiebanner_hide_nonce');
 	global $post;
 	$option_label = __("Hide cookiebanner on this page", "complianz-gdpr");
