@@ -967,7 +967,8 @@ jQuery(document).ready(function ($) {
 			dismissCookieWall();
 		}
 		//dismiss the banner after saving, so it won't show on next page load
-		//if ( complianz.use_categories ) ccName.setStatus('dismiss');
+		if ( complianz.use_categories ) ccName.setStatus('dismiss');
+
 		//check if status is changed from 'allow' to 'revoked'
 		var reload = false;
 		if ($('.cmplz_marketing').length) {
@@ -1109,6 +1110,7 @@ jQuery(document).ready(function ($) {
 	$(document).on('click', '.cc-revoke-custom', function () {
 		var doRevoke = true;
 		if (complianz.consenttype === 'optin' || complianz.consenttype === 'optinstats') {
+
 			$('.cc-revoke').click();
 
 			//tag manager
@@ -1137,7 +1139,7 @@ jQuery(document).ready(function ($) {
 			}
 		} else {
 			//if it's already denied, show the accept option again.
-			if (cmplzGetCookie('complianz_consent_status') === 'dismiss' || cmplzGetCookie('complianz_consent_status') === 'deny') {
+			if ( cmplzGetCookie('complianz_consent_status') === 'deny' ) {
 				$('.cc-revoke').click();
 				$('.cc-revoke').fadeOut();
 				doRevoke = false;
@@ -1145,8 +1147,6 @@ jQuery(document).ready(function ($) {
 		}
 
 		if (doRevoke) {
-			cmplzFireCategories();
-			cmplzUpdateStatusCustomLink();
 			cmplzRevoke();
 		}
 
@@ -1570,7 +1570,7 @@ jQuery(document).ready(function ($) {
 			reload = true;
 		}
 
-		//accept deny variant should revoke if current level is no choice.
+		//accept deny variant should reload if current level is no choice.
 		if (consentLevel === 'no-choice' && complianz.use_categories === 'no' ) {
 			reload = true;
 		}
@@ -1608,15 +1608,17 @@ jQuery(document).ready(function ($) {
 		//marketing cookies acceptance
 		if ($('.cmplz_marketing').length) {
 			cmplzSetCookie('cmplz_marketing', 'deny', complianz.cookie_expiry);
-			cmplzSetCookie('complianz_consent_status', 'deny', complianz.cookie_expiry);
 			cmplz_wp_set_consent('marketing', 'deny');
 		}
+
+		cmplzSetCookie('complianz_consent_status', 'deny', complianz.cookie_expiry);
 
 		//we run it after the deletion of cookies, as there are cookies to be set.
 		cmplzIntegrationsRevoke();
 		cmplzSyncCategoryCheckboxes();
 		cmplzFireCategories();
 		complianz_track_status();
+		cmplzUpdateStatusCustomLink();
 
 		if (reload) {
 			location.reload();
