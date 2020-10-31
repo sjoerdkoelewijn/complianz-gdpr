@@ -392,17 +392,13 @@ if ( ! class_exists( 'cmplz_cookie_blocker' ) ) {
 
 					//when script contains src
 					$script_src_pattern
-						= '/<script [^>]*?src=[\'"](http:\/\/|https:\/\/|\/\/)'
-						  . $url_pattern . '[\'"].*?>/i';
+						= '/<script [^>]*?src=[\'"]' . $url_pattern . '[\'"].*?>/i';
 					if ( preg_match_all( $script_src_pattern, $total_match,
 						$src_matches, PREG_PATTERN_ORDER )
 					) {
 
-						foreach ( $src_matches[2] as $src_key => $script_src ) {
-
-							$script_src = $src_matches[1][ $src_key ]
-							              . $src_matches[2][ $src_key ];
-
+						foreach ( $src_matches[1] as $src_key => $script_src ) {
+							$script_src = $src_matches[1][ $src_key ];
 							$found = $this->strpos_arr( $script_src,
 								$known_script_tags );
 							if ( $found !== false ) {

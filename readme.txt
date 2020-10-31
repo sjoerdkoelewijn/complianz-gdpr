@@ -114,6 +114,11 @@ Canada’s Anti-Spam Legislation (CASL) and Personal Information Protection and 
 With some custom CSS this is possible, but we do not consider a cookie wall to be GDPR compliant, so it's not actively supported. We do, however, have the option to create a Soft Cookie Wall. Which blocks interaction with the website, but dismissing remains a possibility.
 
 == Change log ==
+= 4.7.7 =
+* Improvement: Map Multi Marker integration
+* Fix: proof of consent showing cookie descriptions in white because of new cookie policy css props @ollieuk
+* Fix: cookie descriptions css causing white space at the bottom on some themes props @umutusu
+
 = 4.7.6 =
 * Fix: pass new cookies overview css also when only the cookies shortcode is used
 * Fix: saving of plugin integration settings, props Laura
