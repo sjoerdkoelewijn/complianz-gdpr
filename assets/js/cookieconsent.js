@@ -742,12 +742,14 @@
 
       el.addEventListener('click', this.onButtonClick);
 
-      if (opts.autoAttach) {
-        if (!cont.firstChild) {
-          cont.appendChild(el);
-        } else {
-          cont.insertBefore(el, cont.firstChild)
-        }
+		document.body.append(el);
+
+		// if (opts.autoAttach) {
+        // if (!cont.firstChild) {
+        //   cont.appendChild(el);
+        // } else {
+        //   cont.insertBefore(el, cont.firstChild)
+        // }
       }
 
       return el;
