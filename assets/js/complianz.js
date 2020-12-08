@@ -233,12 +233,20 @@ jQuery(document).ready(function ($) {
 
 		//iframes and video's
 		$('.cmplz-iframe').each(function (i, obj) {
-			var src = $(this).data('src-cmplz');
+			var iframe = $(this);
+			var src = iframe.data('src-cmplz');
 
 			//check if there's an autoplay value we need to pass on
 			var autoplay = cmplzGetUrlParameter($(this).attr('src'), 'autoplay');
 			if (autoplay === '1') src = src + '&autoplay=1';
-			$(this).attr('src', src).on( 'load' , function () {
+
+			//instead of updating the source, we clone the iframe, so we don't experience the problem
+			//that browser keep track of this url change in the history.
+			var newFrame = iframe.get(0).cloneNode(true);
+			var parent = iframe.get( 0 ).parentNode;
+			parent.replaceChild(newFrame, iframe.get( 0 ));
+
+			$(newFrame).attr('src', src).on( 'load' , function () {
 				//fitvids integration, a.o. Beaverbuilder
 				if (typeof $(this).parent().fitVids == 'function') {
 					$(this).parent().fitVids();
@@ -250,7 +258,7 @@ jQuery(document).ready(function ($) {
 					$(this).attr('loading', 'lazy');
 				}
 
-				//we get the closest, not the parent, because a script could have inserted a div in the meantime.
+				// we get the closest, not the parent, because a script could have inserted a div in the meantime.
 				var blockedContentContainer = $(this).closest('.cmplz-blocked-content-container');
 				//now remove the added classes
 				blockedContentContainer.animate({"background-image": "url('')"}, 400, function () {
