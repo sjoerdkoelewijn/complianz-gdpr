@@ -258,8 +258,7 @@ if ( ! class_exists( 'cmplz_cookie_blocker' ) ) {
 			) {
 				foreach ( $matches[0] as $key => $total_match ) {
 					$iframe_src = $matches[2][ $key ] . $matches[3][ $key ];
-					if ( $this->strpos_arr( $iframe_src, $known_iframe_tags )
-					     !== false
+					if ( $this->strpos_arr( $iframe_src, $known_iframe_tags ) !== false
 					) {
 						$placeholder = cmplz_placeholder( false, $iframe_src );
 						$new         = $total_match;
@@ -274,25 +273,17 @@ if ( ! class_exists( 'cmplz_cookie_blocker' ) ) {
 						//we insert video/no-video class for specific video styling
 						if ( $this->is_video( $iframe_src ) ) {
 							$video_class = apply_filters( 'cmplz_video_class', 'cmplz-video cmplz-hidden' );
-							//we add a variable behind the placeholder, so other scripts which randomly add a variable with & won't cause a 404.
-							$source_placeholder = cmplz_url . 'assets/video/youtube-placeholder.mp4?cmplz=1';
 						} else {
-							$video_class        = apply_filters( 'cmplz_video_class', 'cmplz-no-video' );
-							$source_placeholder = 'about:blank';
+							$video_class = apply_filters( 'cmplz_video_class', 'cmplz-no-video' );
 						}
 
-						$source_placeholder
-							 = apply_filters( 'cmplz_source_placeholder',
-							$source_placeholder );
-						$new = $this->replace_src( $new, $source_placeholder );
+						$new = $this->replace_src( $new, apply_filters( 'cmplz_source_placeholder', 'about:blank' ) );
 						$new = $this->add_class( $new, 'iframe',
 							"cmplz-iframe cmplz-iframe-styles $video_class " );
 
 						if ( cmplz_use_placeholder( $iframe_src ) ) {
-							$new = $this->add_class( $new, 'iframe',
-								" cmplz-placeholder-element " );
-							$new = $this->add_data( $new, 'iframe',
-								'placeholder-image', $placeholder );
+							$new = $this->add_class( $new, 'iframe', " cmplz-placeholder-element " );
+							$new = $this->add_data( $new, 'iframe', 'placeholder-image', $placeholder );
 
 							//allow for integrations to override html
 							$new = apply_filters( 'cmplz_iframe_html', $new );
