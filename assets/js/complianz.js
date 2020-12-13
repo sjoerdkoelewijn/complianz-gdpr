@@ -41,6 +41,16 @@ cmplzCookieWarningLoaded
     }
 * */
 
+/**
+ * reload after consent. Only necessary for incomplete integrations, or plugins which handle consent serverside
+jQuery(document).ready(function ($) {
+	document.addEventListener('cmplzStatusChange', function (e) {
+		if (e.detail.category === 'marketing' ) {
+			location.reload();
+		}
+	});
+});
+*/
 jQuery(document).ready(function ($) {
 	var ccStatus;
 	var ccName;
@@ -782,6 +792,12 @@ jQuery(document).ready(function ($) {
 				}
 			},
 			onStatusChange: function (status, chosenBefore) {
+				var details = new Object();
+				details.category = cmplzGetHighestAcceptance();
+				details.region = complianz.region;
+				var event = new CustomEvent('cmplzStatusChange', { detail: details });
+				document.dispatchEvent(event);
+
 				//remove the banner wrap class to dismiss cookie wall styling
 				if (complianz.soft_cookiewall && (status === 'allow' || status === 'dismiss')) {
 					dismissCookieWall();
