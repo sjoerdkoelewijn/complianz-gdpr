@@ -227,16 +227,15 @@ if ( ! class_exists( "cmplz_cookie_admin" ) ) {
 		/**
 		 * create select html for services
 		 *
-		 * @param bool $selected_value
-		 * @param      $language
+		 * @param string $selected_value
+		 * @param string $language
 		 *
 		 * @return string
 		 */
 
-		public function get_services_options( $selected_value = false, $language
-		) {
+		public function get_services_options( $selected_value, $language ) {
 			if ( ! current_user_can( 'manage_options' ) ) {
-				return;
+				return '';
 			}
 
 			$services = $this->get_services( array( 'language' => $language ) );
@@ -268,15 +267,13 @@ if ( ! class_exists( "cmplz_cookie_admin" ) ) {
 		/**
 		 * create select html for service types
 		 *
-		 * @param bool $selected_value
-		 * @param      $language
+		 * @param string $selected_value
+		 * @param string $language
 		 *
 		 * @return string
 		 */
 
-		public function get_serviceTypes_options(
-			$selected_value = false, $language
-		) {
+		public function get_serviceTypes_options( $selected_value, $language ) {
 			if ( ! current_user_can( 'manage_options' ) ) {
 				return '';
 			}
@@ -338,15 +335,13 @@ if ( ! class_exists( "cmplz_cookie_admin" ) ) {
 		/**
 		 * create select html for purposes
 		 *
-		 * @param bool $selected_value
-		 * @param      $language
+		 * @param string $selected_value
+		 * @param string $language
 		 *
 		 * @return string
 		 */
 
-		public function get_cookiePurpose_options(
-			$selected_value = false, $language
-		) {
+		public function get_cookiePurpose_options( $selected_value, $language ) {
 			if ( ! current_user_can( 'manage_options' ) ) {
 				return;
 			}
@@ -439,11 +434,8 @@ if ( ! class_exists( "cmplz_cookie_admin" ) ) {
 				: '';
 			$showOnPolicy   = $cookie->showOnPolicy == 1 ? 'checked="checked"'
 				: '';
-			$services       = $this->get_services_options( $cookie->service,
-				$language );
-			$cookiePurposes
-			                = $this->get_cookiePurpose_options( $cookie->purpose,
-				$language );
+			$services       = $this->get_services_options( $cookie->service, $language );
+			$cookiePurposes = $this->get_cookiePurpose_options( $cookie->purpose, $language );
 
 			$link = '';
 			if ( cmplz_get_value( 'use_cdb_links' ) === 'yes'
@@ -1046,8 +1038,7 @@ if ( ! class_exists( "cmplz_cookie_admin" ) ) {
 				                   . '">' . esc_url_raw( site_url() ) . '</a>';
 				$data            = apply_filters( 'cmplz_api_data', $data );
 				$json            = json_encode( $data );
-				$endpoint        = trailingslashit( CMPLZ_COOKIEDATABASE_URL )
-				                   . 'v1/cookies/';
+				$endpoint        = trailingslashit( CMPLZ_COOKIEDATABASE_URL ) . 'v1/cookies/';
 
 				$ch = curl_init();
 
@@ -1063,13 +1054,9 @@ if ( ! class_exists( "cmplz_cookie_admin" ) ) {
 				);
 
 				$result = curl_exec( $ch );
-				$error  = ( $result == 0
-				            && strpos( $result,
-						'<title>502 Bad Gateway</title>' ) === false ) ? false
-					: true;
+				$error  = ( $result != 0 && strpos( $result, '<title>502 Bad Gateway</title>' ) === false ) ? false : true;
 				if ( $error ) {
-					$msg = __( "Could not connect to cookiedatabase.org",
-						"complianz-gdpr" );
+					$msg = __( "Could not connect to cookiedatabase.org", "complianz-gdpr" );
 				}
 
 				curl_close( $ch );
@@ -1324,11 +1311,7 @@ if ( ! class_exists( "cmplz_cookie_admin" ) ) {
 				);
 
 				$result = curl_exec( $ch );
-
-				$error = ( $result == 0
-				           && strpos( $result,
-						'<title>502 Bad Gateway</title>' ) === false ) ? false
-					: true;
+				$error = ( $result != 0 && strpos( $result, '<title>502 Bad Gateway</title>' ) === false ) ? false : true;
 				if ( $error ) {
 					$msg = __( "Could not connect to cookiedatabase.org",
 						"complianz-gdpr" );

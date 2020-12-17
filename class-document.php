@@ -807,14 +807,12 @@ if ( ! class_exists( "cmplz_document" ) ) {
 		 * @param string $fieldname
 		 * @param int    $post_id
 		 * @param bool   $list_style
+		 * @param string $type
 		 *
 		 * @return string
 		 */
 
-
-		private function get_plain_text_value(
-			$fieldname, $post_id, $list_style = true, $type
-		) {
+		private function get_plain_text_value( $fieldname, $post_id, $list_style, $type ) {
 			$value = cmplz_get_value( $fieldname, $post_id );
 
 			$front_end_label
