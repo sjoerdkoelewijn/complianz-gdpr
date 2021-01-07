@@ -1991,8 +1991,7 @@ if ( ! class_exists( "cmplz_cookie_admin" ) ) {
 			$parse = parse_url($domain);
 			$root_domain = $parse['host'];
 			$path = str_replace(array('http://', 'https://', $root_domain), '', $domain );
-			$path = str_replace('/', '', $path );
-			return $path;
+			return trailingslashit( $path );
 		}
 
 
