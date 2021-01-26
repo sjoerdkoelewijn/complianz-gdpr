@@ -820,6 +820,7 @@ jQuery(document).ready(function ($) {
 						cmplzFireCategories(false, true);
 					}
 				}
+
 				if (status === 'deny' && complianz.consenttype === 'optout') {
 					cmplzRevoke();
 				}
@@ -830,7 +831,7 @@ jQuery(document).ready(function ($) {
 				}
 
 				//when the revoke button is clicked, the status is still 'allow'
-				if (complianz.use_categories === 'no') {
+				if (complianz.use_categories === 'no' && ccStatus === 'allow') {
 					cmplzRevoke();
 					$('.cc-revoke').fadeOut();
 					ccName.open();
@@ -1170,17 +1171,12 @@ jQuery(document).ready(function ($) {
 			}
 		}
 
+		//if it's already denied, show the accept option again.
+		//if not denied, do a full revoke
 		if ( cmplzGetCookie('complianz_consent_status') === 'deny' ) {
-			//when denied, just get the popup again.
 			$('.cc-revoke').click();
 			$('.cc-revoke').fadeOut();
-		} else if ( complianz.use_categories === 'no' ) {
-			//when accept/deny, set to deny, and revoke.
-			//if we set to deny in the revoke function, it will prevent the banner from showing up in other cases.
-			cmplzSetCookie('complianz_consent_status', 'deny', complianz.cookie_expiry);
-			cmplzRevoke();
 		} else {
-			//category banners, do a full revoke
 			cmplzRevoke();
 		}
 	});
@@ -1587,9 +1583,35 @@ jQuery(document).ready(function ($) {
 
 	function cmplzCheckCookiePolicyID() {
 		var user_policy_id = cmplzGetCookie('complianz_policy_id');
-		if (user_policy_id && (complianz.current_policy_id !== user_policy_id)) {
-			cmplzSetCookie("complianz_consent_status", "", 0);
+		if (user_policy_id && (complianz.current_policy_id !== user_policy_id) ) {
+			cmplzClearAllComplianzCookies();
 		}
+	}
+
+	/**
+	 * Clear all our own cookies, to make sure path issues are resolved.
+	 */
+	function clearAllComplianzCookies(){
+		(function () {
+			var cookies = document.cookie.split("; ");
+			for (var c = 0; c < cookies.length; c++) {
+				var d = window.location.hostname.split(".");
+				while (d.length > 0) {
+					var cookieName = cookies[c].split(";")[0].split("=")[0];
+					var cookieBase = encodeURIComponent(cookieName) + '=; expires=Thu, 01-Jan-1970 00:00:01 GMT; domain=' + d.join('.') + ' ;path=';
+					var p = location.pathname.split('/');
+					if ( cookieName.indexOf('cmplz') !==-1 || cookieName.indexOf('complianz') !==-1) {
+						document.cookie = cookieBase + '/';
+						while (p.length > 0) {
+							document.cookie = cookieBase + p.join('/');
+							p.pop();
+						};
+					}
+
+					d.shift();
+				}
+			}
+		})();
 	}
 
 	/**
@@ -1676,6 +1698,7 @@ jQuery(document).ready(function ($) {
 			cmplzSetCookie('cmplz_stats', 'deny', complianz.cookie_expiry);
 			cmplz_wp_set_consent('statistics', 'deny');
 			if (complianz.consenttype === 'optinstats') cmplz_wp_set_consent('statistics-anonymous', 'deny');
+
 		}
 
 		//preferences acceptance
