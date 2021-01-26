@@ -1591,7 +1591,7 @@ jQuery(document).ready(function ($) {
 	/**
 	 * Clear all our own cookies, to make sure path issues are resolved.
 	 */
-	function clearAllComplianzCookies(){
+	function cmplzClearAllComplianzCookies(){
 		(function () {
 			var cookies = document.cookie.split("; ");
 			for (var c = 0; c < cookies.length; c++) {
