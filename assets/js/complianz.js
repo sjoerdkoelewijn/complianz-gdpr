@@ -94,7 +94,7 @@ jQuery(document).ready(function ($) {
 		//especially in case of a window resize, this should not run again after consent has been given.
 		//this is not the same as getHighestAcceptance
 		//we need to check here, because the cmplzEnableMarketing function doesn't run twice
-		if (ccAllEnabled) return;
+		if ( ccAllEnabled ) return;
 
 		$('.cmplz-placeholder-element').each(function () {
 			//we set this element as container with placeholder image
@@ -197,6 +197,8 @@ jQuery(document).ready(function ($) {
 	 */
 	if ( complianz.block_ajax_content == 1 ) {
 		setInterval(function () {
+			//to make sure this function will run, and marketing can get enabled, we set this value to false
+			ccAllEnabled = false;
 			setBlockedContentContainer();
 		}, 2000);
 	}
