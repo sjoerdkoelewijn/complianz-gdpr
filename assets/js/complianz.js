@@ -93,7 +93,8 @@ jQuery(document).ready(function ($) {
 		//to prevent this function to run when cookies are accepted, we check for accepted status here
 		//especially in case of a window resize, this should not run again after consent has been given.
 		//this is not the same as getHighestAcceptance
-		if (!ccAllEnabled) return;
+		//we need to check here, because the cmplzEnableMarketing function doesn't run twice
+		if (ccAllEnabled) return;
 
 		$('.cmplz-placeholder-element').each(function () {
 			//we set this element as container with placeholder image
@@ -137,6 +138,8 @@ jQuery(document).ready(function ($) {
 		/**
 		 * In some cases, like ajax loaded content, the placeholders are initialized again. In that case, the scripts may need to be fired again as well.
 		 * We're assuming that statistics scripts won't be loaded with ajax, so we only load marketing level scripts
+		 *
+		 * As this is now handled in the first line, by checking ccAllEnabled
 		 */
 		if ( cmplzGetHighestAcceptance() === 'marketing') {
 			cmplzEnableMarketing();
