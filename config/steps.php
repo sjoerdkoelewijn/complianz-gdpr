@@ -10,22 +10,21 @@ $this->steps = apply_filters('cmplz_steps',array(
 				'sections' => array(
 					1 => array(
 						'title' => __( 'Visitors', 'complianz-gdpr' ),
-						'intro' => '<h1>'._x('Welcome to the Wizard.','intro first step', 'complianz-gdpr').'</h1><p>'.
-						           sprintf(_x('We have tried to make our Wizard as simple and fast as possible. Although these questions are all necessary, if there’s any way you think we can improve the plugin, please let us %sknow%s!','intro first step', 'complianz-gdpr'),'<a target="_blank" href="https://complianz.io/contact">', '</a>').'<br>'.
+						'intro' => '<p>'. sprintf(_x('The Complianz Wizard will guide you through the necessary steps to configure your website for privacy legislation around the world. Use the %smanual%s for this wizard if you need help during this process. You can also find a (?) after most questions for more info on this specific question.','intro first step', 'complianz-gdpr'),'<a target="_blank" href="https://complianz.io/manual/">', '</a>').'<br>'.
 						           _x('The answers in the first step of the wizard are needed to configure your documents and consent banner specifically to your needs.','intro first step', 'complianz-gdpr').'</p><p>'.
-						           sprintf(_x('Please note that you can always save and finish the wizard later (if you need a break), use our %sdocumentation%s for additional information or log a %ssupport ticket%s if you need our assistance.', 'intro first step', 'complianz-gdpr'),'<a target="_blank" href="https://complianz.io/documentation">', '</a>','<a target="_blank" href="https://complianz.io/support">', '</a>').'</p>',
+						           sprintf(_x('Please note that you can always save and finish the wizard later, use our %sdocumentation%s for additional information or log a %ssupport ticket%s if you need our assistance.', 'intro first step', 'complianz-gdpr'),'<a target="_blank" href="https://complianz.io/documentation">', '</a>','<a target="_blank" href="https://complianz.io/support">', '</a>').'</p>',
 					),
 					2 => array(
 						'id'    => 'general',
 						'title' => __( 'Documents', 'complianz-gdpr' ),
-						'intro' => _x('Here you can select which legal documents you want to generate with Complianz. You can also use existing legal documents.', 'intro company info', 'complianz-gdpr'),
+						'intro' => '<p>'._x('Here you can select which legal documents you want to generate with Complianz. You can also use existing legal documents.', 'intro company info', 'complianz-gdpr').'</p>',
 					),
 					3 => array(
 						'id' => 'impressum_info',
 						'title' => __( 'Website information',
 							'complianz-gdpr' ),
-						'intro' => _x( 'We need some information to be able to generate your documents.',
-							'intro company info', 'complianz-gdpr' ),
+						'intro' => '<p>'._x( 'We need some information to be able to generate your documents.',
+							'intro company info', 'complianz-gdpr' ).'</p>',
 					),
 					4 => array(
 						'id' => 'impressum_info',
@@ -54,9 +53,9 @@ $this->steps = apply_filters('cmplz_steps',array(
 					1 => array(
 						'title' => __( 'Cookie scan', 'complianz-gdpr' ),
 						'intro' =>
-							'<p>'
-							. _x( 'Complianz will scan several pages of your website for first-party cookies and known third-party scripts. The scan will be recurring monthly to keep you up-to-date!',
-								'intro scan', 'complianz-gdpr' ) . '</p>',
+                            '<p>'._x( 'Complianz will scan several pages of your website for first-party cookies and known third-party scripts. The scan will be recurring monthly to keep you up-to-date!',
+								'intro scan', 'complianz-gdpr' ). '</p>'
+                            .'<p>'._x( 'For more information, ', 'complianz-gdpr').'<a href="TODO">'._x('read our 5 tips about the cookie scan.', 'complianz-gdpr').'</a></p>',
 					),
 					2 => array(
 						'title' => __( 'Statistics', 'complianz-gdpr' ),
@@ -71,17 +70,14 @@ $this->steps = apply_filters('cmplz_steps',array(
 
 					5 => array(
 						'title' => __( 'Used cookies', 'complianz-gdpr' ),
-						'intro' => _x( 'With the automatic cookie scan, most first-party cookies should be detected. These cookies will be synchronized with cookiedatabase.org to get the latest information and complete descriptions. Descriptions are by default synchronized with cookiedatabase.org to keep your Cookie Policy up-to-date. To manually edit the cookie, either disable synchronization in your dashboard or make a contribution to cookiedatabase.org.',
-								'intro used cookies', 'complianz-gdpr' )
-						           .'&nbsp;'. sprintf( _x( 'The cookiedatabase.org community will be asked to add missing cookie information. To know more about cookiedatabase.org and cookie descriptions, please read %sthis article%s.',
-								'intro used cookies', 'complianz-gdpr' ),
-								'<a href="https://complianz.io/our-cookiedatabase-a-new-initiative/">',
-								'</a>' )
+						'intro' => '<p>'.sprintf(_x( 'Complianz provides your Cookie Policy with comprehensive cookie descriptions, supplied by cookie database.org. We connect to this open-source database using an external API, which sends the results of the cookiescan (a list of found cookies, used plugins and your domain) to cookie database.org, for the sole purpose of providing you with accurate descriptions and keeping them up-to-date at a weekly schedule. For more information, please read %sthis article%s.',
+                                    'complianz-gdpr' ).'</p>',
+                                    '<a href="https://complianz.io/our-cookiedatabase-a-new-initiative/">', '</a>' )
 					),
 					6 => array(
 						'title' => __( 'Used services', 'complianz-gdpr' ),
-						'intro' => _x( 'Below services use cookies on your website to add functionality. You can use cookiedatabase.org to synchronize information or edit the service if needed. Unknown services will be moderated and added by cookiedatabase.org as soon as possible.',
-							'intro used cookies', 'complianz-gdpr' )
+						'intro' => '<p>'._x( 'Below services use cookies on your website to add functionality. You can use cookiedatabase.org to synchronize information or edit the service if needed. Unknown services will be moderated and added by cookiedatabase.org as soon as possible.',
+							'intro used cookies', 'complianz-gdpr' ).'</p>'
 					),
 
 

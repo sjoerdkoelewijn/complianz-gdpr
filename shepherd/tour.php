@@ -113,7 +113,7 @@ class cmplz_tour {
 					'title'  => __( "Integrations", "complianz-gdpr" ),
 					'text'   => __( "Based on your answers in the Wizard, we will automatically enable integrations with relevant services and plugins. In case you want to block extra scripts, you can add them to the Script Center.",
 						'complianz-gdpr' ),
-					'link'   => admin_url( "admin.php?page=cmplz-settings" ),
+					'link'   => admin_url( "admin.php?page=cmplz-script-center" ),
 					'attach' => '.cmplz-tablinks [bottom right]',
 				),
 				6 => array(
@@ -189,8 +189,8 @@ class cmplz_tour {
 			return;
 		}
 
-		if ( ! isset( $_POST['complianz_nonce'] )
-		     || ! wp_verify_nonce( $_POST['complianz_nonce'], 'complianz_save' )
+		if ( ! isset( $_POST['cmplz_nonce'] )
+		     || ! wp_verify_nonce( $_POST['cmplz_nonce'], 'complianz_save' )
 		) {
 			return;
 		}

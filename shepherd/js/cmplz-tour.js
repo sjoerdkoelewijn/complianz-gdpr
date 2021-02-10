@@ -266,7 +266,7 @@ jQuery(document).ready(function($) {
 		wizard_tour.start();
 	}
 
-	if ($('#cookie-settings .cmplz-tablinks').length) {
+	if ($('#CMPLZ_COOKIEBANNER .cmplz-tablinks').length) {
 		cookiebanner_tour.start();
 	}
 

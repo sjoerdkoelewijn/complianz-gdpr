@@ -3,11 +3,24 @@ defined( 'ABSPATH' ) or die( "you do not have acces to this page!" );
 if ( is_admin() ) {
 	require_once( 'integrations-menu.php' );
 }
-require_once( 'forms.php' );
+require_once( trailingslashit(cmplz_path) . 'integrations/forms.php' );
+require_once( trailingslashit(cmplz_path) . 'integrations/settings.php' );
 
 if ( is_admin() ) {
 	require_once( 'TGM/required.php' );
 }
+
+function cmplz_enqueue_integrations_assets( $hook ) {
+	if ( strpos($hook, "cmplz-script-center")===false  ) return;
+
+	wp_register_script( ' cmplz-pagify', trailingslashit( cmplz_url ) . 'assets/pagify/pagify.min.js', array( "jquery" ), cmplz_version );
+	wp_enqueue_script( ' cmplz-pagify' );
+
+	wp_register_style( ' cmplz-pagify', trailingslashit( cmplz_url ) . 'assets/pagify/pagify.css', false, cmplz_version );
+	wp_enqueue_style( ' cmplz-pagify' );
+
+}
+add_action( 'admin_enqueue_scripts', 'cmplz_enqueue_integrations_assets' );
 
 global $cmplz_integrations_list;
 $cmplz_integrations_list = apply_filters( 'cmplz_integrations', array(
@@ -184,11 +197,11 @@ $cmplz_integrations_list = apply_filters( 'cmplz_integrations', array(
 		'firstparty_marketing' => false,
 	),
 
-	'wp-google-map-plugin'            => array(
-		'constant_or_function' => 'WPGMP_VERSION',
-		'label'                => 'WP Google Map Plugin',
-		'firstparty_marketing' => false,
-	),
+//	'wp-google-map-plugin'            => array(
+//		'constant_or_function' => 'WPGMP_VERSION',
+//		'label'                => 'WP Google Map Plugin',
+//		'firstparty_marketing' => false,
+//	),
 
 	'woocommerce-google-analytics-pro' => array(
 		'constant_or_function' => 'WC_Google_Analytics_Pro_Loader',
@@ -506,7 +519,7 @@ function cmplz_uses_thirdparty( $name ) {
 }
 
 
-add_action( 'complianz_after_field', 'cmplz_add_placeholder_checkbox', 9, 1 );
+add_action( 'complianz_after_label', 'cmplz_add_placeholder_checkbox', 11, 1 );
 function cmplz_add_placeholder_checkbox( $args ) {
 	if ( ! isset( $args['fieldname'] ) || ! isset( $args["type"] )
 	     || $args["type"] !== 'checkbox'
@@ -515,60 +528,65 @@ function cmplz_add_placeholder_checkbox( $args ) {
 	}
 
 	if ( isset( $_GET["page"] ) && $_GET["page"] === 'cmplz-script-center' ) {
-
-		$fieldname     = str_replace( "-", "_",
-			sanitize_text_field( $args['fieldname'] ) );
+		$fieldname     = str_replace( "-", "_", sanitize_text_field( $args['fieldname'] ) );
 		$function_name = $fieldname;
-
-		$has_placeholder
-			                   = ( function_exists( "cmplz_{$function_name}_placeholder" ) );
-		$disabled_placeholders = get_option( 'cmplz_disabled_placeholders',
-			array() );
-		$value                 = ! in_array( $fieldname,
-			$disabled_placeholders );
-
+		$has_placeholder = ( function_exists( "cmplz_{$function_name}_placeholder" ) );
+		$disabled_placeholders = get_option( 'cmplz_disabled_placeholders', array() );
+		$value = ! in_array( $fieldname, $disabled_placeholders );
 		$disabled  = ! $has_placeholder;
 		$fieldname = 'cmplz_placeholder_' . $fieldname;
-
-		if ( $args['table'] ) {
-			echo '</td><td style="width:70%">';
-		} else {
-			echo '</div>';
-		}
 		if ( ! $has_placeholder ) {
 			?>
-			<label class="cmplz-switch">
-				<span class="cmplz-slider-na cmplz-round"></span>
+			<label class="cmplz-checkbox-container cmplz-disabled">N/A
+				<input
+						disabled
+						name=""
+						class=""
+						type="checkbox"
+						value="1">
+				<div class="checkmark"></div>
 			</label>
 			<?php
 		} else {
 			?>
-			<label class="cmplz-switch">
-				<input name="<?php echo esc_html( $fieldname ) ?>" type="hidden"
-				       value=""/ <?php if ( $disabled ) {
-					echo 'disabled';
-				} ?>>
-
-				<input name="<?php echo esc_html( $fieldname ) ?>" size="40"
-				       type="checkbox"
-					<?php if ( $disabled ) {
-						echo 'disabled';
-					} ?>
-					   class="<?php if ( $args['required'] ) {
-						   echo 'is-required';
-					   } ?>"
-					   value="1" <?php checked( 1, $value, true ) ?> />
-				<span class="cmplz-slider cmplz-round"></span>
+			<label class="cmplz-checkbox-container <?php echo $disabled ? 'cmplz-disabled' : '' ?>"><?php _e("Placeholder", "complianz-gdpr") ?>
+				<input
+						name="<?php echo esc_html( $fieldname ) ?>"
+						type="hidden"
+						value="0"
+						<?php if ( $disabled ) {echo 'disabled';} ?>
+				>
+				<input
+						<?php if ( $disabled ) {echo 'disabled';} ?>
+						name="<?php echo $fieldname ?>"
+						type="checkbox"
+						value="1"
+						<?php checked( 1, $value, true ) ?>
+				>
+				<div
+						class="checkmark <?php echo $disabled ? 'cmplz-disabled' : '' ?>"
+						<?php checked( 1, $value, true ) ?>
+				><?php echo cmplz_icon('check', 'success'); ?></div>
 			</label>
 			<?php
-		}
-		if ( $args['table'] ) {
-			echo '</td></tr>';
-		} else {
-			echo '</div>';
 		}
 	}
 }
+
+function cmplz_notify_of_plugin_integrations( $warnings ){
+	$fields = COMPLIANZ::$config->fields( 'integrations' );
+	foreach ($fields as $id => $field ) {
+		if ($field['disabled']) continue;
+		$warnings[$id] = array(
+			'open' => sprintf(__( 'We have enabled the %s integration.', 'complianz-gdpr' ), $field['label']).cmplz_read_more("https://complianz.io/enabled-integration"),
+		);
+	}
+
+	return $warnings;
+}
+
+add_filter( 'cmplz_warning_types', 'cmplz_notify_of_plugin_integrations' );
+
 
 /**
  * placeholders that are disabled will be removed by hook here.

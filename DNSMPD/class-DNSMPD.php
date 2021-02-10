@@ -35,8 +35,7 @@ if ( ! class_exists( "cmplz_DNSMPD" ) ) {
 				return;
 			}
 
-			if ( ! cmplz_has_region( 'us' )
-			     || ! cmplz_sells_personal_data()
+			if ( ! cmplz_dnsmpi_required()
 			) {
 				return;
 			}

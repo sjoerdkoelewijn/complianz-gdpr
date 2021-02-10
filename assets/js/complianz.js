@@ -106,9 +106,10 @@ jQuery(document).ready(function ($) {
 			//insert placeholder text
 			if (cmplzGetHighestAcceptance() !== 'marketing' && !blockedImageContainer.find(".cmplz-blocked-content-notice").length) {
 				var placeholderText = complianz.placeholdertext;
-				if (typeof placeholderText !== 'undefined') blockedImageContainer.append('<button tabindex=0 class="cmplz-blocked-content-notice cmplz-accept-marketing">' + placeholderText + '</button>');
+				if (typeof placeholderText !== 'undefined') blockedImageContainer.append('<button class="cmplz-blocked-content-notice cmplz-accept-marketing">' + placeholderText + '</button>');
 			}
 		});
+
 
 		$('.cmplz-placeholder-element').each(function () {
 			if ( $(this).hasClass('cmplz-processed') ) return;
@@ -139,7 +140,7 @@ jQuery(document).ready(function ($) {
 				//insert placeholder text
 				if (cmplzGetHighestAcceptance() !== 'marketing' && !blockedContentContainer.find(".cmplz-blocked-content-notice").length) {
 					var placeholderText = complianz.placeholdertext;
-					if (typeof placeholderText !== 'undefined') blockedContentContainer.append('<button tabindex=0 class="cmplz-blocked-content-notice cmplz-accept-marketing">' + placeholderText + '</button>');
+					if (typeof placeholderText !== 'undefined') blockedContentContainer.append('<button class="cmplz-blocked-content-notice cmplz-accept-marketing">' + placeholderText + '</button>');
 				}
 
 				//handle image size for video
@@ -597,6 +598,7 @@ jQuery(document).ready(function ($) {
 	//if not stored yet, load. As features in the user object can be changed on updates, we also check for the version
 	if ( complianz.geoip == 1 && (cmplz_user_data.length === 0 || (cmplz_user_data.version !== complianz.version) || (cmplz_user_data.banner_version !== complianz.banner_version)) ) {
 		var request = new XMLHttpRequest();
+
 		request.open('GET', complianz.url.replace('/v1', '/v1/banner'), true);
 		request.setRequestHeader('Content-type', 'application/json');
 		request.send();
@@ -636,6 +638,9 @@ jQuery(document).ready(function ($) {
 		//merge userdata with complianz data, in case a b testing is used with user specific cookie banner data
 		//objects are merged so user_data will override data in complianz object
 		complianz = cmplzMergeObject(complianz, cmplz_user_data);
+
+		// Disable cookie banner setting
+		if (complianz.disable_cookiebanner) return;
 
 		//check if we need to redirect to another legal document, for a specific region
 		cmplzMaybeAutoRedirect();
@@ -728,7 +733,8 @@ jQuery(document).ready(function ($) {
 		} else {
 			setStatusAsBodyClass('deny');
 			//the load revoke container loads the notification for the user that DNT has been enabled.
-			cmplzLoadRevokeContainer()
+			cmplzLoadRevokeContainer();
+			complianz_track_status( 'do_not_track' );
 		}
 
 	}
@@ -750,16 +756,38 @@ jQuery(document).ready(function ($) {
 	function cmplz_cookie_warning() {
 		//apply custom css
 		var css = '';
-
-		if (complianz.use_categories === 'hidden' || complianz.use_categories === 'visible' || complianz.use_custom_cookie_css) {
-
-			css += '#cc-window.cc-window .cc-compliance .cc-btn.cc-accept-all {color:' + complianz.accept_all_text_color + ';background-color:' + complianz.accept_all_background_color + ';border-color:' + complianz.accept_all_border_color + '}';
-			css += '#cc-window.cc-window .cc-compliance .cc-btn.cc-accept-all:hover{background-color:' + getHoverColour(complianz.accept_all_background_color) + '}';
-
+		if (complianz.use_categories === 'hidden' || complianz.use_categories === 'visible') {
+			// Accept all
+			css += '#cc-window.cc-window .cc-compliance .cc-btn.cc-accept-all {color:' + complianz.colorpalette_button_accept_text + ';background-color:' + complianz.colorpalette_button_accept_background + ';border-color:' + complianz.colorpalette_button_accept_border + '}';
+			css += '#cc-window.cc-window .cc-compliance .cc-btn.cc-accept-all:hover{background-color:' + getHoverColour(complianz.colorpalette_button_accept_background) + '}';
 		}
+		if (complianz.use_categories === 'no') {
+            // Accept
+            css += '#cc-window.cc-window .cc-compliance .cc-btn.cc-allow {color:' + complianz.colorpalette_button_accept_text + ';background-color:' + complianz.colorpalette_button_accept_background + ';border-color:' + complianz.colorpalette_button_accept_border + '}';
+            css += '#cc-window.cc-window .cc-compliance .cc-btn.cc-allow:hover{background-color:' + getHoverColour(complianz.colorpalette_button_accept_background) + '}';
+		}
+        if (complianz.use_categories === 'hidden' || complianz.use_categories === 'visible') {
+            // View settings
+            css += '.cc-compliance .cc-btn.cc-show-settings{color:' + complianz.colorpalette_button_settings_text + '!important;background-color:' + complianz.colorpalette_button_settings_background + '!important;border-color:' + complianz.colorpalette_button_settings_border + '!important}';
+            css += '.cc-compliance .cc-btn.cc-show-settings:hover{background-color:' + complianz.colorpalette_button_settings_background + '!important}';
+        }
+        if (complianz.use_categories === 'hidden' || complianz.use_categories === 'visible' || complianz.use_categories === 'legacy') {
+            // Save settings
+            css += '.cc-compliance .cc-btn.cc-save-settings{color:' + complianz.colorpalette_button_settings_text + '!important;background-color:' + complianz.colorpalette_button_settings_background + '!important;border-color:' + complianz.colorpalette_button_settings_border + '!important}';
+            css += '.cc-compliance .cc-btn.cc-save-settings:hover{background-color:' + complianz.colorpalette_button_settings_background + '!important}';
 
-		css += '#cc-window.cc-window .cc-compliance .cc-btn.cc-dismiss{color:' + complianz.functional_text_color + ';background-color:' + complianz.functional_background_color + ';border-color:' + complianz.functional_border_color + '}';
-		css += '#cc-window.cc-window .cc-compliance .cc-btn.cc-dismiss:hover{background-color:' + getHoverColour(complianz.functional_background_color) + '}';
+            if (complianz.checkbox_style == 'slider') {
+            	// Slider
+                css += ".cmplz-slider-checkbox input:checked + .cmplz-slider {background-color: " + complianz.colorpalette_toggles_background + "!important}";
+                css += '.cmplz-slider-checkbox .cmplz-slider {background-color: ' + complianz.colorpalette_toggles_inactive + '!important;}';
+                css += ".cmplz-slider-checkbox input:focus + .cmplz-slider {}";
+                css += ".cmplz-slider-checkbox .cmplz-slider:before {background-color: " + complianz.colorpalette_toggles_bullet + "!important;}.cmplz-slider-checkbox .cmplz-slider-na:before {color:" + complianz.toggles_bulletColor + "!important;}";
+            }
+        }
+
+        // Functional only
+		css += '#cc-window.cc-window .cc-compliance .cc-btn.cc-dismiss{color:' + complianz.colorpalette_button_deny_text + ';background-color:' + complianz.colorpalette_button_deny_background + ';border-color:' + complianz.colorpalette_button_deny_border_ + '}';
+		css += '#cc-window.cc-window .cc-compliance .cc-btn.cc-dismiss:hover{background-color:' + getHoverColour(complianz.colorpalette_button_deny_background) + '}';
 
 		if ( complianz.banner_width !== 468 ) {
 			css += "#cc-window.cc-floating {max-width:" + complianz.banner_width + "px;}";
@@ -773,23 +801,23 @@ jQuery(document).ready(function ($) {
 			$('<style>').prop("type", "text/css").html(css).appendTo("head");
 		}
 
-		var save_button = '<a aria-label="{{save_preferences}}" href="#" class="cc-btn cc-save cc-save-settings">{{save_preferences}}</a>';
+		var save_button = '<a href="#" role="button" class="cc-btn cc-save cc-save-settings">{{save_preferences}}</a>';
 		if (complianz.use_categories === 'hidden' ) {
 			if (complianz.tcf_active) {
-				save_button = '<a aria-label="{{settings}}" href="#" class="cc-btn cc-save cc-show-settings">{{settings}}</a><a aria-label="{{dismiss}}" href="#" class="cc-btn cc-dismiss">{{dismiss}}</a>';
+				save_button = '<a href="#" role="button" class="cc-btn cc-save cc-show-settings">{{settings}}</a><a role="button" href="#" class="cc-btn cc-dismiss">{{dismiss}}</a>';
 			} else {
-				save_button = '<a aria-label="{{dismiss}}" href="#" class="cc-btn cc-dismiss">{{dismiss}}</a><a aria-label="{{settings}}" href="#" class="cc-btn cc-save cc-show-settings">{{settings}}</a>';
+				save_button = '<a href="#" role="button" class="cc-btn cc-dismiss">{{dismiss}}</a><a role="button" href="#" class="cc-btn cc-save cc-show-settings">{{settings}}</a>';
 			}
 		}
 
 		if (complianz.use_categories === 'visible' || complianz.use_categories === 'hidden' ) {
-			save_button = '<a aria-label="{{accept_all}}" href="#" class="cc-btn cc-accept-all">{{accept_all}}</a>'+save_button;
+			save_button = '<a href="#" role="button" class="cc-btn cc-accept-all">{{accept_all}}</a>'+save_button;
 		}
 
-		var dismiss_button = '<a aria-label="{{dismiss}}" href="#" role="button" class="cc-btn cc-dismiss">{{dismiss}}</a>';
-		var allow_button = '<a aria-label="{{allow}}" href="#" role="button" class="cc-btn cc-save cc-allow">{{allow}}</a>';
+		var dismiss_button = '<a href="#" role="button" role="button" class="cc-btn cc-dismiss">{{dismiss}}</a>';
+		var allow_button = '<a href="#" role="button" role="button" class="cc-btn cc-save cc-allow">{{allow}}</a>';
 		if (complianz.consenttype === 'optout' ) {
-			dismiss_button ='<a aria-label="{{dismiss}}" href="#" role="button" class="cc-btn cc-allow">{{dismiss}}</a>';
+			dismiss_button ='<a href="#" role="button" role="button" class="cc-btn cc-allow">{{dismiss}}</a>';
 		}
 
 		//to be able to hide the banner on the cookie policy
@@ -807,6 +835,8 @@ jQuery(document).ready(function ($) {
 				if (complianz.soft_cookiewall && (status === 'allow' || status === 'dismiss')) {
 					dismissCookieWall();
 				}
+
+
 
 				/**
 				 * This runs when the banner is dismissed or accepted.
@@ -829,6 +859,15 @@ jQuery(document).ready(function ($) {
 				//remove the banner wrap class to dismiss cookie wall styling
 				if (complianz.soft_cookiewall && (status === 'allow' || status === 'dismiss')) {
 					dismissCookieWall();
+				}
+
+				if (status === 'allow' || status === 'dismiss') {
+					$('.cc-window').addClass('cmplz-dismiss');
+					//because of the animations, the banner is not set to display none anymore. But to make sure we still can click on stuff, we need to set it
+					//to display none after the window has been animated away.
+					setTimeout( function(e){
+						$('.cc-window').css('display', 'none');
+					}, 1000);
 				}
 
 				//opt out cookie banner can be dismissed on scroll or on timeout.
@@ -863,6 +902,7 @@ jQuery(document).ready(function ($) {
 				}
 			},
 			onRevokeChoice: function () {
+				$('.cc-window').removeClass('cmplz-dismiss');
 				if (complianz.soft_cookiewall) {
 					activateCookieWall();
 				}
@@ -878,21 +918,28 @@ jQuery(document).ready(function ($) {
 			"dismissOnTimeout": parseInt(complianz.dismiss_on_timeout),
 			"dismissOnScroll": parseInt(complianz.dismiss_on_scroll),
 			"dismissOnWindowClick": true,
-			"revokeBtn": '<div class="cc-revoke ' + complianz.hide_revoke + ' {{classes}}">' + complianz.revoke + '</div>',
+			"revokeBtn": '<button type="button" class="cc-revoke ' + complianz.hide_revoke + ' {{classes}}">' + complianz.revoke + '</button>',
 			"palette": {
 				"popup": {
-					"background": complianz.popup_background_color,
-					"text": complianz.popup_text_color
+					"background": complianz.colorpalette_background_color,
+					"text": complianz.colorpalette_text_color,
+                    "link": complianz.colorpalette_text_hyperlink,
+                    "border": complianz.border_color,
+                    "borderwidth": complianz.colorpalette_border_width,
+                    "borderradius": complianz.colorpalette_border_radius,
+                    "boxshadow": complianz.box_shadow,
 				},
 				"button": {
-					"background": complianz.button_background_color,
-					"text": complianz.button_text_color,
-					"border": complianz.border_color
+					"background": complianz.colorpalette_button_accept_color,
+					"text": complianz.colorpalette_button_accept_text,
+					"border": complianz.border_color,
+                    "borderradius": complianz.colorpalette_buttons_border_radius,
 				}
 			},
 			"theme": complianz.theme,
-			"static": complianz.static,
+			// "static": complianz.static,
 			"position": complianz.position,
+			"animation": complianz.animation,
 			"type": complianz.type,
 			"layout": complianz.layout,
 			"layouts": {
@@ -907,11 +954,12 @@ jQuery(document).ready(function ($) {
 				"allow": allow_button,
 				"save": save_button,
 				"categories-checkboxes": complianz.categories,
-				"messagelink": '<span id="cookieconsent:desc" class="cc-message">{{message}} <a aria-label="{{link}}" class="cc-link" href="{{href}}">{{link}}</a>' + complianz.privacy_link[complianz.region] + '</span>',
+				"messagelink": '<div class="cc-header">{{header}}</div>&nbsp;<div id="cookieconsent:desc" class="cc-message">{{message}} <a class="cc-link" href="{{href}}">{{link}}</a>' + complianz.privacy_link[complianz.region] + '</div>',
 			},
 			"content": {
 				"save_preferences": complianz.save_preferences,
 				"deny": '',
+				"header": complianz.header,
 				"message": complianz.message,
 				"dismiss": complianz.dismiss,
 				"allow": complianz.accept,
@@ -1104,16 +1152,13 @@ jQuery(document).ready(function ($) {
 
 		//track status on saving of settings.
 		complianz_track_status();
-		if (complianz.use_categories !== 'no') {
-			if (cmplzGetHighestAcceptance() === 'no_choice' || cmplzGetHighestAcceptance() === 'functional') {
-				cmplzRevoke();
-			}
+		if ( complianz.use_categories !== 'no' && cmplzGetHighestAcceptance() === 'functional' ) {
+			cmplzRevoke();
 		}
 
 		cmplzUpdateStatusCustomLink(false);
 		ccName.close();
 		$('.cc-revoke').fadeIn();
-
 		if (reload) {
 			location.reload();
 		}
@@ -1138,7 +1183,6 @@ jQuery(document).ready(function ($) {
 			} else {
 				cats = [status];
 			}
-
 			consentClass = status;
 		}
 
@@ -1424,11 +1468,7 @@ jQuery(document).ready(function ($) {
 			return 'prefs';
 		}
 
-		if (cmplzInArray( 'cmplz_functional', consentedCategories )) {
-			return 'functional';
-		}
-
-		return 'no_choice';
+		return 'functional';
 	}
 
 	/**
@@ -1718,12 +1758,12 @@ jQuery(document).ready(function ($) {
 		var consentLevel = cmplzGetHighestAcceptance();
 		var reload = false;
 
-		if (consentLevel !== 'no_choice' && consentLevel !== 'functional' ) {
+		if (consentLevel !== 'functional' ) {
 			reload = true;
 		}
 
-		//accept deny variant should reload if current level is functional.
-		if (consentLevel === 'functional' && complianz.use_categories === 'no' ) {
+		//accept deny variant should reload always on revoke
+		if ( complianz.use_categories === 'no' ) {
 			reload = true;
 		}
 

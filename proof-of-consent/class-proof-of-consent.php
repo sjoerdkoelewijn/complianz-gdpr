@@ -10,6 +10,7 @@ if ( ! class_exists( "cmplz_proof_of_consent" ) ) {
 					get_class( $this ) ) );
 			}
 			self::$_this = $this;
+
 			if ( cmplz_get_value('records_of_consent') !== 'yes' || defined('cmplz_free') ) {
 				add_action( 'cmplz_admin_menu', array( $this, 'menu_item' ), 10 );
 				add_action( 'wp_ajax_cmplz_delete_snapshot', array( $this, 'ajax_delete_snapshot' ) );
@@ -44,7 +45,6 @@ if ( ! class_exists( "cmplz_proof_of_consent" ) ) {
 			}
 			return 0;
 		}
-
 
 		/**
 		 * Get list of cookie statement snapshots
@@ -298,8 +298,7 @@ if ( ! class_exists( "cmplz_proof_of_consent" ) ) {
 				$banner_id = cmplz_get_default_banner_id();
 				$banner    = new CMPLZ_COOKIEBANNER( $banner_id );
 				$settings  = $banner->get_settings_array();
-				$settings['privacy_link_us ']
-				           = COMPLIANZ::$document->get_page_url( 'privacy-statement', 'us' );
+				$settings['privacy_link_us '] = COMPLIANZ::$document->get_page_url( 'privacy-statement', 'us' );
 				$settings_html = '';
 				$skip          = array(
 					'categorie',
@@ -308,10 +307,6 @@ if ( ! class_exists( "cmplz_proof_of_consent" ) ) {
 					'static',
 					'set_cookies',
 					'hide_revoke',
-					'popup_background_color',
-					'popup_text_color',
-					'button_background_color',
-					'button_text_color',
 					'position',
 					'theme',
 					'version',
@@ -326,14 +321,16 @@ if ( ! class_exists( "cmplz_proof_of_consent" ) ) {
 					'layout',
 					'use_custom_css',
 					'custom_css',
-					'border_color',
-					'accept_all_background_color',
-					'accept_all_text_color',
-					'accept_all_border_color',
-					'functional_background_color',
-					'functional_text_color',
-					'functional_border_color',
 					'banner_width',
+                    'colorpalette_background',
+                    'colorpalette_text',
+                    'colorpalette_toggles',
+                    'colorpalette_border_radius',
+                    'colorpalette_border_width',
+                    'colorpalette_button_accept',
+                    'colorpalette_button_deny',
+                    'colorpalette_button_settings',
+                    'colorpalette_buttons_border_radius',
 				);
 				$cats_pattern = '/data-category="(.*?)"/i';
 				if (isset($settings['categories'])) {
@@ -376,15 +373,11 @@ if ( ! class_exists( "cmplz_proof_of_consent" ) ) {
 						'<a target="_blank" href="https://complianz.io/consent">',
 						"</a>" ) . '</p>';
 				COMPLIANZ::$document->generate_pdf( 'cookie-statement', $region, false, true, $intro, $settings_html );
-
 				do_action('cmplz_after_proof_of_consent_generation', get_option( 'cmplz_generate_new_cookiepolicy_snapshot') );
 			}
 
 
 			update_option( 'cmplz_generate_new_cookiepolicy_snapshot', false );
 		}
-
-
-
 	}
 } //class closure
