@@ -814,10 +814,10 @@ jQuery(document).ready(function ($) {
 			save_button = '<a href="#" role="button" class="cc-btn cc-accept-all">{{accept_all}}</a>'+save_button;
 		}
 
-		var dismiss_button = '<a href="#" role="button" role="button" class="cc-btn cc-dismiss">{{dismiss}}</a>';
-		var allow_button = '<a href="#" role="button" role="button" class="cc-btn cc-save cc-allow">{{allow}}</a>';
+		var dismiss_button = '<a href="#" role="button" class="cc-btn cc-dismiss">{{dismiss}}</a>';
+		var allow_button = '<a href="#" role="button"  class="cc-btn cc-save cc-allow">{{allow}}</a>';
 		if (complianz.consenttype === 'optout' ) {
-			dismiss_button ='<a href="#" role="button" role="button" class="cc-btn cc-allow">{{dismiss}}</a>';
+			dismiss_button ='<a href="#" role="button" class="cc-btn cc-allow">{{dismiss}}</a>';
 		}
 
 		//to be able to hide the banner on the cookie policy
