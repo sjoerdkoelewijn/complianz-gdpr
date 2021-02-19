@@ -37,10 +37,7 @@ function cmplz_jetpack_placeholder( $tags ) {
  * @param bool $stats_category_required
  */
 function cmplz_jetpack_set_statistics_required( $stats_category_required ){
-	if ( class_exists( 'Jetpack' ) && Jetpack::is_module_active( 'stats' ) ) {
-		$stats_category_required = true;
-	}
-	return $stats_category_required;
+	return true;
 }
 add_filter('cmplz_cookie_warning_required_stats', 'cmplz_jetpack_set_statistics_required');
 
