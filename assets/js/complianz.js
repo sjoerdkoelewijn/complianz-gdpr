@@ -249,7 +249,8 @@ jQuery(document).ready(function ($) {
 		});
 
 		//blocked images
-		$('.cmplz-image').each(function (i, obj) {
+		var images = $('.cmplz-image');
+		images.each(function (i, obj) {
 			if ( $(this).hasClass('cmplz-activated') ) return;
 			$(this).addClass('cmplz-activated' );
 
@@ -261,6 +262,7 @@ jQuery(document).ready(function ($) {
 			}
 		});
 
+		//iframes and video's
 		$('.cmplz-iframe').each(function (i, obj) {
 			if ( $(this).hasClass('cmplz-activated') ) return;
 			$(this).addClass('cmplz-activated' );
@@ -356,9 +358,11 @@ jQuery(document).ready(function ($) {
 				} else {
 					$.getScript(src)
 						.done(function (s, Status) {
+							var allScriptsExecuted = true;
 							//check if we have waiting scripts
 							var waitingScript = cmplzGetWaitingScript(waitingScripts, src);
 							if (waitingScript) {
+								allScriptsExecuted = false;
 								$.getScript(waitingScript).done(function (script, textStatus) {
 									cmplzRunAfterAllScripts();
 								}).fail(function (jqxhr, settings, exception) {
@@ -368,11 +372,12 @@ jQuery(document).ready(function ($) {
 
 							var waitingInlineScript = cmplzGetWaitingScript(waitingInlineScripts, src);
 							if (waitingInlineScript) {
+								allScriptsExecuted = false;
 								cmplzRunInlineScript(waitingInlineScript);
 							}
 
 							//maybe all scripts are already done
-							cmplzRunAfterAllScripts();
+							if (allScriptsExecuted) cmplzRunAfterAllScripts();
 						})
 						.fail(function (jqxhr, settings, exception) {
 							console.warn("Something went wrong " + exception);
@@ -385,18 +390,6 @@ jQuery(document).ready(function ($) {
 					return;
 				}
 				cmplzRunInlineScript($(this));
-				//get scripts that are waiting for this inline script
-				var waitingScript = cmplzGetWaitingScript(waitingScripts, $(this).text());
-				if (waitingScript !== false) {
-					$.getScript(waitingScript)
-						.done(function (s, Status) {
-							//maybe all scripts are already done
-							cmplzRunAfterAllScripts();
-						})
-						.fail(function (jqxhr, settings, exception) {
-							console.warn("Something went wrong " + exception);
-						});
-				}
 			}
 		});
 
@@ -428,15 +421,14 @@ jQuery(document).ready(function ($) {
 	function cmplzGetWaitingScript(waitingScripts, src) {
 		for (var waitfor in waitingScripts) {
 			var waitingScript;//recaptcha/api.js, waitfor="gregaptcha"
-
 			if (waitingScripts.hasOwnProperty(waitfor)) {
 				waitingScript = waitingScripts[waitfor];
-				if (typeof waitingScript !== 'string') waitingScript = waitingScript.text();
+				if (typeof waitingScript !== 'string') {
+					waitingScript = waitingScript.text();
+				}
 				if (src.indexOf(waitfor) !== -1) {
-
 					var output = waitingScripts[waitfor];
 					delete waitingScripts[waitfor];
-
 					return output;
 				}
 			}
@@ -485,10 +477,8 @@ jQuery(document).ready(function ($) {
 
 	function cmplzRunAfterAllScripts() {
 		if (!cmplzAllScriptsHookFired && cmplzArrayIsEmpty(waitingInlineScripts) && cmplzArrayIsEmpty(waitingScripts) ) {
-			//hook
 			var event = new CustomEvent( 'cmplzRunAfterAllScripts' );
 			document.dispatchEvent(event);
-
 			cmplzAllScriptsHookFired = true;
 		}
 	}
@@ -501,8 +491,23 @@ jQuery(document).ready(function ($) {
 	function cmplzRunInlineScript(script) {
 		$('<script>')
 			.attr('type', 'text/javascript')
-			.text(script.text())
-			.appendTo(script.parent());
+			.text(script.text()).appendTo(script.parent());
+
+		//get scripts that are waiting for this inline script
+		var waitingScript = cmplzGetWaitingScript(waitingScripts, script.text());
+		if (waitingScript !== false) {
+			$.getScript(waitingScript)
+				.done(function (s, Status) {
+					//maybe all scripts are already done
+					cmplzRunAfterAllScripts();
+				})
+				.fail(function (jqxhr, settings, exception) {
+					console.warn("Something went wrong " + exception);
+				});
+		} else {
+			cmplzRunAfterAllScripts();
+		}
+
 		script.remove();
 	}
 

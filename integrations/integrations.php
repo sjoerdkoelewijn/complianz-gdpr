@@ -11,9 +11,20 @@ if ( is_admin() ) {
 
 global $cmplz_integrations_list;
 $cmplz_integrations_list = apply_filters( 'cmplz_integrations', array(
+	'avada' => array(
+			'constant_or_function' => 'Avada',
+			'label'                => 'Avada',
+			'firstparty_marketing' => false,
+	),
 	'advanced-nocaptcha-recaptcha' => array(
 			'constant_or_function' => 'ANR_PLUGIN_VERSION',
 			'label'                => 'Advanced noCaptcha & invisible Captcha',
+			'firstparty_marketing' => false,
+	),
+
+	'ultimate-addons-elementor' => array(
+			'constant_or_function' => 'UAEL_FILE',
+			'label'                => 'Ultimate Addons for Elementor',
 			'firstparty_marketing' => false,
 	),
 
@@ -23,15 +34,15 @@ $cmplz_integrations_list = apply_filters( 'cmplz_integrations', array(
 			'firstparty_marketing' => false,
 	),
 
-	'citadela-directory' => array(
-			'constant_or_function' => 'CITADELA_DIRECTORY_LITE_PLUGIN',
-			'label'                => 'Citadela Directory',
+	'novo-map' => array(
+			'constant_or_function' => 'NOVO_MAP_VERSION',
+			'label'                => 'Novo-Map',
 			'firstparty_marketing' => false,
 	),
 
-	'elementor' => array(
-			'constant_or_function' => 'ELEMENTOR_VERSION',
-			'label'                => 'Elementor',
+	'citadela-directory' => array(
+			'constant_or_function' => 'CITADELA_DIRECTORY_LITE_PLUGIN',
+			'label'                => 'Citadela Directory',
 			'firstparty_marketing' => false,
 	),
 

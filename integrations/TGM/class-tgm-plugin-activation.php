@@ -1221,6 +1221,7 @@ if ( ! class_exists( 'CMPLZ_Plugin_Activation' ) ) {
 								$count
 							)
 						);
+
 					}
 					unset( $type, $plugin_group, $linked_plugins, $count, $last_plugin, $imploded );
 
