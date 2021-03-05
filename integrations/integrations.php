@@ -9,9 +9,13 @@ if ( is_admin() ) {
 	require_once( 'TGM/required.php' );
 }
 
-
 global $cmplz_integrations_list;
 $cmplz_integrations_list = apply_filters( 'cmplz_integrations', array(
+	'avada' => array(
+			'constant_or_function' => 'Avada',
+			'label'                => 'Avada',
+			'firstparty_marketing' => false,
+	),
 	'advanced-nocaptcha-recaptcha' => array(
 			'constant_or_function' => 'ANR_PLUGIN_VERSION',
 			'label'                => 'Advanced noCaptcha & invisible Captcha',
