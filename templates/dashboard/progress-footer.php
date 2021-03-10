@@ -1,9 +1,10 @@
 <?php
-	$cookieblocker = cmplz_get_value( 'disable_cookie_block' ) == 1 ? 'warning' : 'completed';
-	$placeholder = cmplz_get_value( 'dont_use_placeholders' ) == 1 ? 'warning' : 'completed';
+	$wizard_completed = COMPLIANZ::$wizard->wizard_completed_once();
+	$cookieblocker = $wizard_completed && cmplz_get_value( 'disable_cookie_block' ) != 1 ? 'completed' : 'warning';
+	$placeholder = $wizard_completed && cmplz_get_value( 'dont_use_placeholders' ) != 1 ? 'completed' : 'warning';
 	$default_banner = cmplz_get_default_banner_id();
 	$banner = new CMPLZ_COOKIEBANNER($default_banner);
-	$cookiebanner = !$banner->disable_cookiebanner && COMPLIANZ::$cookie_admin->site_needs_cookie_warning();
+	$cookiebanner = $wizard_completed && !$banner->disable_cookiebanner && COMPLIANZ::$cookie_admin->site_needs_cookie_warning();
 	$cookiebanner = $cookiebanner ? 'completed' : 'warning';
 
 ?>

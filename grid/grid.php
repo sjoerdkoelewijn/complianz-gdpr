@@ -180,13 +180,7 @@ function cmplz_grid_element($grid_item){
     ob_start();
     require $file;
     $contents = ob_get_clean();
-
-    // Controls
-    if ( ! $grid_item['controls'] ) {
-        $controls = apply_filters('cmplz_controls_'.$grid_item['body'], $grid_item['controls']);
-    } else {
-        $controls = $grid_item['controls'];
-    }
+    $controls = apply_filters('cmplz_controls_'.$grid_item['name'], $grid_item['controls']);
 
     // Body
     if ( ! $grid_item['body'] ) {

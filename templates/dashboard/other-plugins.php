@@ -19,6 +19,12 @@ $plugins = array(
 			'url' => 'https://wordpress.org/plugins/really-simple-ssl/',
 			'title' => 'Really Simple SSL - '. __("Easily migrate your website to SSL.", "really-simple-ssl"),
 	),
+	'COMPLIANZTC' => array(
+			'constant_free' => 'cmplz_tc_version',
+			'constant_premium' => 'cmplz_tc_version',
+			'website' => 'https://complianz.io',
+			'search' => 'complianz+terms+conditions+stand-alone',
+	),
 );
 ?>
 <div>

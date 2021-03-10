@@ -543,7 +543,7 @@ if ( ! function_exists( 'cmplz_notice' ) ) {
 	}
 }
 
-if ( ! function_exists( 'cmplz_notification' ) ) {
+if ( ! function_exists( 'cmplz_sidebar_notice' ) ) {
 	/**
 	 * @param string $msg
 	 * @param string $type notice | warning | success
@@ -554,7 +554,7 @@ if ( ! function_exists( 'cmplz_notification' ) ) {
 	 * @return string|void
 	 */
 
-	function cmplz_notification( $msg, $type = 'notice', $remove_after_change = false, $echo = true, $condition = false) {
+	function cmplz_sidebar_notice( $msg, $type = 'notice', $remove_after_change = false, $echo = true, $condition = false) {
 		if ( $msg == '' ) {
 			return;
 		}
@@ -585,6 +585,38 @@ if ( ! function_exists( 'cmplz_notification' ) ) {
 	}
 }
 
+if ( !function_exists('cmplz_admin_notice')) {
+	/**
+	 * @param $msg
+	 */
+	function cmplz_admin_notice( $msg ) {
+		/**
+		 * Prevent notice from being shown on Gutenberg page, as it strips off the class we need for the ajax callback.
+		 *
+		 * */
+		$screen = get_current_screen();
+		if ( $screen->parent_base === 'edit' ) {
+			return;
+		}
+		?>
+		<div id="message"
+			 class="updated fade notice is-dismissible cmplz-admin-notice really-simple-plugins"
+			 style="border-left:4px solid #333">
+			<div class="cmplz-admin-notice-container">
+				<div class="cmplz-logo"><img width=80px"
+													 src="<?php echo cmplz_url ?>/assets/images/icon-128x128.png"
+													 alt="logo">
+				</div>
+				<div style="margin-left:30px">
+					<?php echo $msg ?>
+				</div>
+			</div>
+		</div>
+		<?php
+
+	}
+}
+
 if ( ! function_exists( 'cmplz_panel' ) ) {
 
 	function cmplz_panel($title, $html, $custom_btn = '', $validate = '', $echo = true, $open = false) {
@@ -599,7 +631,7 @@ if ( ! function_exists( 'cmplz_panel' ) ) {
             <div class="cmplz-panel-title">
 
                 <span class="cmplz-panel-toggle">
-                    '. cmplz_icon('arrow-right', 'normal') .'
+                    '. cmplz_icon('arrow-right', 'success') .'
                     <span class="cmplz-title">' . $title . '</span>
                  </span>
 
@@ -836,6 +868,12 @@ if ( ! function_exists( 'cmplz_statistics_no_sharing_allowed' ) ) {
 
 		//only applies to google
 		return false;
+	}
+}
+
+if ( ! function_exists( 'cmplz_consent_required_for_anonymous_stats' ) ) {
+	function cmplz_consent_required_for_anonymous_stats() {
+		return COMPLIANZ::$cookie_admin->consent_required_for_anonymous_stats();
 	}
 }
 
@@ -1102,7 +1140,7 @@ if (!function_exists('cmplz_read_more')) {
 	 */
 	function cmplz_read_more( $url, $add_space = true ) {
 		$html
-			= sprintf( __( "For more information on this subject, please read this %sarticle%s",
+			= sprintf( __( "For more information on this subject, please read this %sarticle%s.",
 			'complianz-gdpr' ), '<a target="_blank" href="' . $url . '">',
 			'</a>' );
 		if ( $add_space ) {
@@ -1113,7 +1151,13 @@ if (!function_exists('cmplz_read_more')) {
 	}
 }
 
-/*
+if (!function_exists('cmplz_settings_overlay')) {
+	function cmplz_settings_overlay($msg) {
+		echo '<div class="cmplz-settings-overlay"><div class="cmplz-settings-overlay-message">'.$msg.'</div></div>';
+	}
+}
+
+/**
  * Get string of supported laws
  *
  * */
@@ -1451,7 +1495,7 @@ if ( ! function_exists( 'cmplz_flag' ) ) {
 
 		$html = '<div class="cmplz-region-indicator">';
 		foreach ( $regions as $region ) {
-            $html .= '<img src="' . cmplz_url . '/assets/images/' . strtolower( $region ) . '.png">';
+            $html .= cmplz_region_icon($region);
 		}
         $html .= '</div>';
 
@@ -2042,13 +2086,23 @@ if ( ! function_exists( 'cmplz_get_consenttype_nice_name' ) ) {
 	function cmplz_get_consenttype_nice_name( $consent_type ){
 		switch ($consent_type) {
 			case 'optout':
-				return __('Opt out', 'complianz-gdpr');
-			case 'optin_stats':
-				return __('Opt in statistics', 'complianz-gdpr');
+				return __('Opt-out', 'complianz-gdpr');
+			case 'optinstats':
+				return __('Opt-in statistics', 'complianz-gdpr');
 			case 'optin':
 			default:
-				return __('Opt in', 'complianz-gdpr');
+				return __('Opt-in', 'complianz-gdpr');
 		}
+	}
+}
+
+if ( ! function_exists( 'cmplz_short_date_format') ) {
+	/**
+	 * Make sure the date formate is always the short version. If "F" (February) is used, replace with "M" (Feb)
+	 * @return string
+	 */
+	function cmplz_short_date_format(){
+		return str_replace( array('F', 'Y'), array('M', 'y'), get_option( 'date_format' ) );
 	}
 }
 

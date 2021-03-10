@@ -1,13 +1,9 @@
-@default-margin: 15px;
-@default-padding: 20px;
-@brand-primary: #29b6f6;
-@color-success: #61ce70;
-@color-disabled: #d7d7d7;
-@light-grey:#eeeeee;
-@color_warning: #d7263d;
+// Import Complianz LESS Variables
+@import 'variables.less';
 
-
-/*Loader*/
+.row-actions{
+  left:0;
+}
 /*loader*/
 .cmplz-loader {
   margin: 0;
@@ -74,7 +70,31 @@
 	}
 }
 
+/**
+Admin notice
+ */
+.cmplz-admin-notice {
+
+  .cmplz-admin-notice-container {
+	display: flex;
+	padding: 12px;
+	align-items: center;
+
+	.cmplz-logo img {
+	  margin-top: 0.5em;
+	}
+
+	.dashicons {
+	  margin-left: 10px;
+	  margin-right: 5px;
+	}
+  }
+}
+
 #complianz {
+  .cmplz-copy-shortcode{
+	cursor:pointer;
+  }
   .cmplz-selectable {
 	-webkit-touch-callout: all; /* iOS Safari */
 	-webkit-user-select: all; /* Safari */
@@ -136,9 +156,13 @@
 				stroke:@color-success;;
 				fill:@color-success;;
 			}
-			&.documents-shortcode {
+			&.shortcode {
 				color:#000;
+			  &.copied {
+				color:@color-success;
+			  }
 			}
+
 		}
 		&.cmplz-disabled {
 			color:@color-disabled;
@@ -167,7 +191,7 @@
 			  background-color: @brand-primary;
 			}
 			&.cmplz-warning  {
-			  background-color: @color_warning;
+			  background-color: @color-warning;
 			}
 
 		}

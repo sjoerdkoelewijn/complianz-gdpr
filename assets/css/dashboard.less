@@ -1,11 +1,6 @@
-@default-margin: 15px;
-@default-padding: 20px;
-@brand-primary: #29b6f6;
-@color-success: #61ce70;
-@color-open: #f8be2e;
-@color-warning: #d7263d;
-@color-disabled: #d7d7d7;
-@light-grey: #eeeeee;
+// Import Complianz LESS Variables
+@import 'variables.less';
+
 .cmplz-bullet {
   height: 13px;
   width: 13px;
@@ -41,18 +36,18 @@
 	}
 
 	button {
+	  margin-top:10px;
 	  border: 0;
 	  background-color: transparent;
 	  cursor:pointer;
 	  .cmplz-close-warning-x {
 		color: #ccc;
-		font-size: 22px;
+		font-size: 0.9em;
 	  }
 	}
-
   }
   .rsssl-scroll-container {
-	height: 280px;
+	height: 260px;
 	margin-top: 20px;
   }
  .cmplz-progress-status-container {
@@ -89,7 +84,7 @@
   //progress bar
   .cmplz-progress-bar, .cmplz-sync-progress-bar {
 	border-radius:5px;
-	background: @light-grey;
+	background: @grey-light;
 	justify-content: flex-start;
 	align-items: center;
 	position: relative;
@@ -134,22 +129,21 @@
 
   /* Documents overview */
   .cmplz-shortcode {
-	display: none;
+	left:1000px;
 	position:absolute;
 	background-color:#fff;
 	padding: 0;
 	white-space: nowrap;
   }
 
-  .documents-shortcode {
+  .shortcode {
 	cursor:pointer;
   }
 
   .cmplz-support {
 	textarea {
-	  margin-top: 5px;
 	  width: 100%;
-	  height: 77px;
+	  height: 75px;
 	  border-color: #cecece;
 	  font-size: 13px;
 	}
@@ -185,6 +179,10 @@
 	}
   }
 
+  .button {
+	min-width:100px;
+	text-align:center;
+  }
   .item-footer {
 	a.button + a.button {
 	  margin-left:10px;
@@ -210,7 +208,7 @@
 
 
 // break points
-@grid_margin:10px;
+@grid-margin:10px;
 @break-xs: 400px;
 @break-s: 600px;
 @break-m: 768px;
@@ -226,46 +224,46 @@
 	}
 
 	@media only screen and (min-width: @break-xs) {
-	  width: calc(100% - 2 *  @grid_margin );
+	  width: calc(100% - 2 *  @grid-margin );
 	}
 
 	@media only screen and (min-width: @break-s) {
-	  width: calc(100% - 2 *  @grid_margin );
+	  width: calc(100% - 2 *  @grid-margin );
 	}
 
 	@media only screen and (min-width: @break-m) {
-	  width: calc(100% - 2 *  @grid_margin );
+	  width: calc(100% - 2 *  @grid-margin );
 	}
 
 	@media only screen and (min-width: @break-l) {
-	  width: calc(100% - 2 *  @grid_margin );
+	  width: calc(100% - 2 *  @grid-margin );
 	}
 
 	@media only screen and (min-width: @break-xl) {
-	  width: calc(50% - 2 *  @grid_margin );
+	  width: calc(50% - 2 *  @grid-margin );
 	}
 
 	&.small {
-	  width: calc(100% - 2 *  @grid_margin);
+	  width: calc(100% - 2 *  @grid-margin);
 
 	  @media only screen and (min-width: @break-xs) {
-		width: calc(100% - 2 * @grid_margin);
+		width: calc(100% - 2 * @grid-margin);
 	  }
 
 	  @media only screen and (min-width: @break-s) {
-		width: calc(100% - 2 * @grid_margin);
+		width: calc(100% - 2 * @grid-margin);
 	  }
 
 	  @media only screen and (min-width: @break-m) {
-		width: calc(50% - 2 *  @grid_margin);
+		width: calc(50% - 2 *  @grid-margin);
 	  }
 
 	  @media only screen and (min-width: @break-l) {
-		width: calc(50% - 2 *  @grid_margin);
+		width: calc(50% - 2 *  @grid-margin);
 	  }
 
 	  @media only screen and (min-width: @break-xl) {
-		width: calc(25% - 2 *  @grid_margin);
+		width: calc(25% - 2 *  @grid-margin);
 	  }
 	}
   }

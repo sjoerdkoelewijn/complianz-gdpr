@@ -6,15 +6,20 @@
  * @param string $icon_name
  * @param string $status
  * @param string $tooltip (optional)
+ * @param int $size (optional)
  *
  * @return string
  */
-function cmplz_icon( $icon_name, $status, $tooltip = '') {
-	$size = 14;
-	$vb = 22;
+function cmplz_icon( $icon_name, $status, $tooltip = '', $size = 14) {
+	$vb = $size + 8;
 	$icons = array(
-		'documents-sync' => array(
+		'sync' => array(
 			'success' => array(
+				'type' => 'svg',
+				'icon'    => '<svg xmlns="http://www.w3.org/2000/svg" height="' . $size . '" viewBox="0 0 ' . $vb . ' ' . $vb . '" width="' . $size . '"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg>',
+				'tooltip' =>__( 'Document is kept up to date by Complianz', 'complianz-gdpr' ),
+			),
+			'error' => array(
 				'type' => 'svg',
 				'icon'    => '<svg xmlns="http://www.w3.org/2000/svg" height="' . $size . '" viewBox="0 0 ' . $vb . ' ' . $vb . '" width="' . $size . '"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg>',
 				'tooltip' =>__( 'Document is kept up to date by Complianz', 'complianz-gdpr' ),
@@ -25,21 +30,25 @@ function cmplz_icon( $icon_name, $status, $tooltip = '') {
 				'tooltip' => __( 'Document is not kept up to date by Complianz', 'complianz-gdpr' )
 			)
 		),
-		'documents-shortcode' => array(
+//		'eu' => array(
+//			'success' => array(
+//				'type' => 'svg',
+//				'icon'    => '<svg height="' . $size . '" id="Layer_1" version="1.1" viewBox="0 0 ' . $vb . ' ' . $vb . '" width="' . $size . '" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><g><g><defs><circle cx="500" cy="500" id="SVGID_1_" r="500"/></defs><clipPath id="SVGID_2_"><use overflow="visible" xlink:href="#SVGID_1_"/></clipPath><rect clip-path="url(#SVGID_2_)" fill="#ED2224" height="' . $size . '" width="' . $size . '" x="-168"/><rect clip-path="url(#SVGID_2_)" fill="#FFFFFF" height="' . $size . '" width="' . $size . '" x="166"/><path clip-path="url(#SVGID_2_)" d="M499.987,229.625l-45.573,85c-5.174,9.245-14.437,8.383-23.699,3.223     l-32.996-17.083l24.587,130.565c5.172,23.85-11.416,23.85-19.611,13.537L345.114,380.4l-9.349,32.743     c-1.075,4.299-5.818,8.812-12.929,7.735l-72.815-15.311l19.128,69.534c4.096,15.473,7.286,21.879-4.137,25.957l-25.95,12.199     l125.349,101.811c4.956,3.856,7.461,10.784,5.702,17.053l-10.974,36.003c43.16-4.978,81.831-12.46,125.009-17.071     c3.81-0.405,10.196,5.883,10.171,10.3l-5.722,131.897h20.987l-3.309-131.61c-0.026-4.417,5.768-10.992,9.577-10.587     c43.179,4.611,81.851,12.094,125.009,17.071l-10.974-36.003c-1.762-6.269,0.744-13.196,5.703-17.053l125.347-101.811     l-25.95-12.199c-11.422-4.077-8.232-10.483-4.136-25.957l19.126-69.534l-72.814,15.311c-7.111,1.077-11.854-3.437-12.93-7.735     l-9.347-32.743l-57.584,64.466c-8.192,10.313-24.781,10.313-19.608-13.537l24.587-130.565l-32.996,17.083     c-9.264,5.161-18.526,6.022-23.699-3.223" fill="#ED2224"/></g></g></svg>',
+//				'tooltip' =>__( 'Document is kept up to date by Complianz', 'complianz-gdpr' ),
+//			),
+//		),
+		'shortcode' => array(
 			'success' => array(
 				'type' => 'dashicons',
-				'icon'    => 'dashicons-shortcode',
-				'tooltip' =>__( 'Click to view the document shortcode', 'complianz-gdpr' ),
+				'icon'    => 'dashicons-admin-page',
+				'tooltip' =>__( 'Click to copy the document shortcode', 'complianz-gdpr' ),
 			),
-            'success_notooltip' => array(
-                'type' => 'dashicons',
-                'icon'    => 'dashicons-shortcode',
-            ),
 			'disabled' => array(
 				'type' => 'dashicons',
-				'icon'    => 'dashicons-shortcode',
+				'icon'    => 'dashicons-admin-page',
 			)
 		),
+
 		'bullet' => array(
 			'success' => array(
 				'type' => 'css',
@@ -84,32 +93,32 @@ function cmplz_icon( $icon_name, $status, $tooltip = '') {
 	            'icon' => '<svg width="10" height="10" viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg"><path d="M1671 566q0 40-28 68l-724 724-136 136q-28 28-68 28t-68-28l-136-136-362-362q-28-28-28-68t28-68l136-136q28-28 68-28t68 28l294 295 656-657q28-28 68-28t68 28l136 136q28 28 28 68z"/></svg>',
             ),
         ),
-        'arrow-right-alt2' => array(
+        'arrow-right' => array(
             'success' => array(
                 'type' => 'dashicons',
                 'icon'    => 'dashicons-arrow-right-alt2',
             ),
         ),
-        'arrow-right' => array(
-            'normal' => array(
-                'type' => 'dashicons',
-                'icon'    => 'dashicons-arrow-right',
-            ),
-        ),
-        'sync' => array(
-            'success' => array(
-                'type' => 'dashicons',
-                'icon' => 'dashicons-update',
-            ),
-            'error' => array(
-                'type' => 'dashicons',
-                'icon' => 'dashicons-update',
-            ),
-            'disabled' => array(
-                'type' => 'dashicons',
-                'icon' => 'dashicons-update',
-            ),
-        ),
+		'arrow-left' => array(
+			'success' => array(
+				'type' => 'dashicons',
+				'icon'    => 'dashicons-arrow-left-alt2',
+			),
+		),
+//        'sync' => array(
+//            'success' => array(
+//                'type' => 'dashicons',
+//                'icon' => 'dashicons-update',
+//            ),
+//            'error' => array(
+//                'type' => 'dashicons',
+//                'icon' => 'dashicons-update',
+//            ),
+//            'disabled' => array(
+//                'type' => 'dashicons',
+//                'icon' => 'dashicons-update',
+//            ),
+       // ),
         'file' => array(
             'success' => array(
                 'type' => 'dashicons',
@@ -160,10 +169,12 @@ function cmplz_icon( $icon_name, $status, $tooltip = '') {
 
 /**
  * Get icon for a region
- * @param $region
+ * @param string $region
+ * @param int $size
  *
  * @return string
  */
-function cmplz_region_icon($region){
-	return '<img width="16px" height="16px" src="' . cmplz_url . '/assets/images/' . $region .'.png">';
+function cmplz_region_icon($region, $size = 16){
+//	return cmplz_icon($region,'success', '', $size );
+	return '<img width="'.intval($size).'px" height="'.intval($size).'px" src="' . cmplz_url . 'assets/images/' . strtolower($region) .'.svg">';
 }

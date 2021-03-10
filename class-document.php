@@ -40,6 +40,20 @@ if ( ! class_exists( "cmplz_document" ) ) {
 		}
 
 		/**
+		 * Check if current locale supports formal
+		 *
+		 * @return bool
+		 */
+		public function locale_has_formal_variant() {
+			$locale = get_locale();
+			if ( in_array( $locale, COMPLIANZ::$config->formal_languages) ) {
+				return true;
+			}
+
+			return false;
+		}
+
+		/**
 		 * Get list of documents from the field list
 		 * @return array
 		 */
@@ -928,7 +942,7 @@ if ( ! class_exists( "cmplz_document" ) ) {
 			}
 
 			if ( empty( $filelist ) ) {
-				return false;
+				return array();
 			}
 
 			$page       = (int) $args['offset'];
@@ -945,7 +959,7 @@ if ( ! class_exists( "cmplz_document" ) ) {
 			$filelist = array_slice( $filelist, $offset, $limit );
 
 			if ( empty( $filelist ) ) {
-				return false;
+				return array();
 			}
 
 			return $filelist;
@@ -1173,7 +1187,7 @@ if ( ! class_exists( "cmplz_document" ) ) {
 
 		}
 
-		/*
+		/**
          * This class is extended with pro functions, so init is called also from the pro extension.
          * */
 
@@ -1181,7 +1195,6 @@ if ( ! class_exists( "cmplz_document" ) ) {
 			//this shortcode is also available as gutenberg block
 			add_shortcode( 'cmplz-document', array( $this, 'load_document' ) );
 			add_shortcode( 'cmplz-consent-area', array( $this, 'show_consent_area' ) );
-
 			add_shortcode( 'cmplz-cookies', array( $this, 'cookies' ) );
 			add_filter( 'display_post_states', array( $this, 'add_post_state') , 10, 2);
 
@@ -1195,40 +1208,24 @@ if ( ! class_exists( "cmplz_document" ) ) {
 
 			add_shortcode( 'cmplz-manage-consent', array( $this, 'manage_consent_html' ) );
 			add_shortcode( 'cmplz-revoke-link', array( $this, 'revoke_link' ) );
-
 			add_shortcode( 'cmplz-accept-link', array( $this, 'accept_link' ) );
-			add_shortcode( 'cmplz-do-not-sell-personal-data-form',
-				array( $this, 'do_not_sell_personal_data_form' ) );
+			add_shortcode( 'cmplz-do-not-sell-personal-data-form', array( $this, 'do_not_sell_personal_data_form' ) );
 
 			//clear shortcode transients after post update
-			add_action( 'save_post',
-				array( $this, 'clear_shortcode_transients' ), 10, 1 );
-			add_action( 'cmplz_wizard_add_pages_to_menu',
-				array( $this, 'wizard_add_pages_to_menu' ), 10, 1 );
-			add_action( 'cmplz_wizard_add_pages',
-				array( $this, 'callback_wizard_add_pages' ), 10, 1 );
-			add_action( 'admin_init',
-				array( $this, 'assign_documents_to_menu' ) );
-			add_action( 'wp_enqueue_scripts',
-				array( $this, 'enqueue_assets' ) );
-
+			add_action( 'save_post', array( $this, 'clear_shortcode_transients' ), 10, 1 );
+			add_action( 'cmplz_wizard_add_pages_to_menu', array( $this, 'wizard_add_pages_to_menu' ), 10, 1 );
+			add_action( 'cmplz_wizard_add_pages', array( $this, 'callback_wizard_add_pages' ), 10, 1 );
+			add_action( 'admin_init', array( $this, 'assign_documents_to_menu' ) );
+			add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_assets' ) );
 			add_action( 'admin_init', array( $this, 'add_privacy_info' ) );
-
-
-			add_filter( 'cmplz_document_email',
-				array( $this, 'obfuscate_email' ) );
-
-			add_filter( 'body_class',
-				array( $this, 'add_body_class_for_complianz_documents' ) );
+			add_filter( 'cmplz_document_email', array( $this, 'obfuscate_email' ) );
+			add_filter( 'body_class', array( $this, 'add_body_class_for_complianz_documents' ) );
 
 			//unlinking documents
 			add_action( 'add_meta_boxes', array( $this, 'add_meta_box' ) );
 			add_action( 'save_post', array( $this, 'save_metabox_data' ) );
-
 			add_action( 'wp', array( $this, 'maybe_autoredirect' ) );
-			add_action( 'wp_ajax_cmplz_create_pages',
-				array( $this, 'ajax_create_pages' ) );
-
+			add_action( 'wp_ajax_cmplz_create_pages', array( $this, 'ajax_create_pages' ) );
 		}
 
 		/**
@@ -1622,13 +1619,13 @@ if ( ! class_exists( "cmplz_document" ) ) {
 
             <?php $pages = COMPLIANZ::$document->get_required_pages();
 			if (count($pages)==0){ ?>
-				<?php cmplz_notification(__("You haven't selected any legal documents to create. You can skip this step", "complianz-gdpr"), "warning"); ?>
+				<?php cmplz_sidebar_notice(__("You haven't selected any legal documents to create. You can skip this step", "complianz-gdpr"), "warning"); ?>
 			<?php } else {
 				$missing_pages = false;
 				?>
 				<div class="field-group add-pages">
                     <div class="cmplz-field">
-				        <div class="cmplz-add-pages-table">
+				        <div class="cmplz-add-pages-table shortcode-container">
                         <?php foreach ( $pages as $region => $region_pages ) {
                             foreach ( $region_pages as $type => $page ) {
                                 $current_page_id   = $this->get_shortcode_page_id( $type, $region, false);
@@ -1645,17 +1642,18 @@ if ( ! class_exists( "cmplz_document" ) ) {
                                 }
                                 $shortcode = $this->get_shortcode( $type, $region, $force_classic = true );
                                 ?>
-                                <div>
-                                    <input
-                                            name="<?php echo $type ?>"
-                                            data-region="<?php echo $region ?>"
-                                            class="<?php echo $class ?> cmplz-create-page-title"
-                                            type="text"
-                                            value="<?php echo $title ?>">
-                                    <?php echo $icon ?>
-                                </div>
-                                <span><?php echo cmplz_icon('documents-shortcode', 'success_notooltip'); ?></span>
-                                <span class="cmplz-selectable"><?php echo $shortcode; ?></span>
+									<div>
+										<input
+												name="<?php echo $type ?>"
+												data-region="<?php echo $region ?>"
+												class="<?php echo $class ?> cmplz-create-page-title"
+												type="text"
+												value="<?php echo $title ?>">
+										<?php echo $icon ?>
+									</div>
+									<div class="cmplz-hidden cmplz-shortcode" id="<?php echo $type?>"><?php echo $shortcode?></div>
+									<span class="cmplz-copy-shortcode"><?php echo cmplz_icon('shortcode', 'success'); ?></span>
+
                                 <?php
                             }
                         } ?>
@@ -1690,7 +1688,7 @@ if ( ! class_exists( "cmplz_document" ) ) {
 			if ( ! function_exists( 'wp_get_nav_menu_name' ) ) {
                 echo '<div class="field-group cmplz-link-to-menu">';
                 echo '<div class="cmplz-field"></div>';
-				cmplz_notification( __( 'Your WordPress version does not support the functions needed for this step. You can upgrade to the latest WordPress version, or add the pages manually to a menu.',
+				cmplz_sidebar_notice( __( 'Your WordPress version does not support the functions needed for this step. You can upgrade to the latest WordPress version, or add the pages manually to a menu.',
                     'complianz-gdpr' ), 'warning' );
                 echo '</div>';
 				return;
@@ -2594,6 +2592,23 @@ if ( ! class_exists( "cmplz_document" ) ) {
 
 		}
 
+		/**
+		 * Check if all required pages are creatd
+		 */
+		public function all_required_pages_created(){
+			$pages = $this->get_required_pages();
+			$total_pages = $existing_pages= 0;
+			foreach ( $pages as $region => $region_pages ) {
+				foreach ( $region_pages as $type => $page ) {
+					if ( COMPLIANZ::$document->page_exists( $type, $region ) ) {
+						$existing_pages ++;
+					}
+					$total_pages ++;
+				}
+			}
+
+			return $total_pages === $existing_pages;
+		}
 
 		/**
 		 *

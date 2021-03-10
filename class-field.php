@@ -296,7 +296,6 @@ if ( ! class_exists( "cmplz_field" ) ) {
 			$fieldvalue = apply_filters("cmplz_fieldvalue", $fieldvalue, $fieldname);
 			$fields    = COMPLIANZ::$config->fields();
 			$fieldname = str_replace( "cmplz_", '', $fieldname );
-
 			//do not save callback fields
 			if ( isset( $fields[ $fieldname ]['callback'] ) ) {
 				return;
@@ -333,7 +332,6 @@ if ( ! class_exists( "cmplz_field" ) ) {
 			if ( ! empty( $options ) ) {
 				update_option( 'complianz_options_' . $page, $options );
 			}
-
 			do_action( "complianz_after_save_" . $page . "_option", $fieldname, $fieldvalue, $prev_value, $type );
 		}
 
@@ -402,7 +400,7 @@ if ( ! class_exists( "cmplz_field" ) ) {
 			}
 			switch ( $type ) {
 				case 'colorpicker':
-					return sanitize_hex_color( $value );
+					return is_array($value ) ? array_map( 'sanitize_hex_color', $value ) : sanitize_hex_color($value);
 				case 'text':
 					return sanitize_text_field( $value );
 				case 'multicheckbox':
@@ -543,7 +541,7 @@ if ( ! class_exists( "cmplz_field" ) ) {
 			echo '</div><!--close in after field-->';
 			echo '<div class="cmplz-help-warning-wrap">';
 			if ( isset( $args['help'] ) ) {
-				cmplz_notification( wp_kses_post( $args['help'] ) );
+				cmplz_sidebar_notice( wp_kses_post( $args['help'] ) );
 			}
 
 			do_action( 'cmplz_notice_' . $args['fieldname'], $args );
@@ -789,13 +787,9 @@ if ( ! class_exists( "cmplz_field" ) ) {
                 }
 
                 // Default index
-                $defaults = apply_filters( 'cmplz_default_value', $args['default'], $fieldname );
+                $defaults = apply_filters( 'cmplz_default_value', $args['default'], $args['fieldname'] );
                 foreach ($args['options'] as $option_key => $option_label) {
-                    if ( ! is_array($defaults) ) { // If default_index is not array, make into array
-                        $default_index[$option_key] = ($defaults == $option_key) ? 'cmplz-default' : '';
-                    } else {
-                        $default_index[$option_key] = in_array($option_key, $defaults) ? 'cmplz-default' : '';
-                    }
+                	$default_index[$option_key] = isset($defaults[$option_key]) && $defaults[$option_key] == 1 ? 'cmplz-default' : '';
                 }
 
                 // Disabled index
@@ -1117,15 +1111,13 @@ if ( ! class_exists( "cmplz_field" ) ) {
         {
 			$default_args = $this->default_args;
 			$args         = wp_parse_args( $args, $default_args );
-
 			if ( ! $type ) {
-				if ( $args['condition'] ) {
+				if ( isset( $args['condition'] ) ) {
 					$type = 'condition';
-				} elseif ( $args['callback_condition'] ) {
+				} elseif ( isset( $args['callback_condition']) ) {
 					$type = 'callback_condition';
 				}
 			}
-
 			if ( ! $type || ! $args[ $type ] ) {
 				return true;
 			}
@@ -1137,10 +1129,12 @@ if ( ! class_exists( "cmplz_field" ) ) {
 			}
 
 			$condition = $args[ $type ];
-
+			_log($condition);
 			//if we're checking the condition, but there's also a callback condition, check that one as well.
 			//but only if it's an array. Otherwise it's a func.
 			if ( $type === 'condition' && isset( $args['callback_condition'] ) && is_array( $args['callback_condition'] ) ) {
+				_log("callback is array ");
+
 				$condition += $args['callback_condition'];
 			}
 
@@ -1285,7 +1279,7 @@ if ( ! class_exists( "cmplz_field" ) ) {
 				'editor_height' => 500,
 				'textarea_rows' => 15,
 			);?>
-				<div class="cmplz-editor-container" style="height:500px;">
+				<div class="cmplz-editor-container">
 			<?php wp_editor( $value, $fieldname, $settings ); ?>
 				</div>
 			<?php do_action( 'complianz_after_field', $args ); ?>
@@ -1573,8 +1567,7 @@ if ( ! class_exists( "cmplz_field" ) ) {
 				$default_args = $this->default_args;
 				$args         = wp_parse_args( $args, $default_args );
 
-				$type              = ( $args['callback'] ) ? 'callback'
-					: $args['type'];
+				$type              = ( $args['callback'] ) ? 'callback' : $args['type'];
 				$args['fieldname'] = $fieldname;
 
 				if ( $type == 'callback' ) {
@@ -1707,8 +1700,6 @@ if ( ! class_exists( "cmplz_field" ) ) {
 			$args
 		) {
 			$callback = $args['callback'];
-			$fieldname = 'cmplz_' . $args['fieldname'];
-
 			do_action( 'complianz_before_label', $args );
 			?>
 			<?php do_action( 'complianz_label_html' , $args );?>
@@ -1728,11 +1719,17 @@ if ( ! class_exists( "cmplz_field" ) ) {
 				return;
 			}
 			do_action( 'complianz_before_label', $args );
-			cmplz_notice( $args['label'], 'warning' );
 			do_action( 'complianz_after_label', $args );?>
 			</div>
 			<?php
-			do_action( 'complianz_after_field', $args );
+			echo '</div><!--close in after field-->';
+			echo '<div class="cmplz-help-warning-wrap">';
+			if ( isset( $args['help'] ) ) {
+				cmplz_sidebar_notice( wp_kses_post( $args['help'] ) );
+			}
+
+			echo '</div>';
+			echo '</div>';
 		}
 
 		public
@@ -1953,7 +1950,7 @@ if ( ! class_exists( "cmplz_field" ) ) {
 				<div class="cmplz-skeleton"></div>
 			</div>
             <button type="button"
-                    class="button cmplz-edit-item"
+                    class="button cmplz-edit-item button-primary"
                     name="cmplz_add_item"
                     data-type='cookie'
                     data-action="add"
@@ -2018,7 +2015,7 @@ if ( ! class_exists( "cmplz_field" ) ) {
 			</div>
 
 			<button type="button"
-                    class="button cmplz-edit-item"
+                    class="button cmplz-edit-item button-primary"
 			        name="cmplz_add_item"
                     data-type='service'
                     data-action="add"

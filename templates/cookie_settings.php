@@ -86,10 +86,10 @@
         <button class="button cmplz-edit-item button-primary" type="button" data-action="save"
                 data-type="cookie" name="cmplz-save-item"><?php _e( 'Save',
                 'complianz-gdpr' ) ?></button>
-        <button class="button cmplz-edit-item button-red" type="button" data-action="delete"
+        <button class="button cmplz-edit-item button-primary button-red" type="button" data-action="delete"
                 data-type="cookie" name="cmplz_remove_item"><?php _e( "Delete",
                 'complianz-gdpr' ) ?></button>
-        <button class="button cmplz-edit-item" type="button" data-action="restore"
+        <button class="button cmplz-edit-item button-primary" type="button" data-action="restore"
                 data-type="cookie" name="cmplz_restore_item"><?php _e( "Restore",
                 'complianz-gdpr' ) ?></button>
     </div>

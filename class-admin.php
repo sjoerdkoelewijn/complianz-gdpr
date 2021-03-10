@@ -29,6 +29,7 @@ if ( ! class_exists( "cmplz_admin" ) ) {
 			add_action('cmplz_fieldvalue', array($this, 'filter_cookie_domain'), 10, 2);
 			add_action( 'wp_ajax_cmplz_dismiss_warning', array( $this, 'dismiss_warning' ) );
 			add_action( 'wp_ajax_cmplz_load_warnings', array( $this, 'ajax_load_warnings' ) );
+			add_action( 'wp_ajax_cmplz_load_gridblock', array( $this, 'ajax_load_gridblock' ) );
 		}
 
 		static function this() {
@@ -100,6 +101,34 @@ if ( ! class_exists( "cmplz_admin" ) ) {
 					'html' => $html,
 					'count_all' => $all_count,
 					'count_remaining' => $remaining_count,
+			);
+
+			die( json_encode( $out ) );
+		}
+
+
+		/**
+		 *
+		 */
+		public function ajax_load_gridblock() {
+			$error   = false;
+			$html = '';
+			if ( ! is_user_logged_in() ) {
+				$error = true;
+			}
+
+			if (!isset($_GET['template'])) {
+				$error = true;
+			}
+
+			if (!$error) {
+				$template = sanitize_title($_GET['template']);
+				$html = cmplz_get_template("dashboard/$template.php");
+			}
+
+			$out = array(
+					'success' => ! $error,
+					'html' => $html,
 			);
 
 			die( json_encode( $out ) );
@@ -560,6 +589,12 @@ if ( ! class_exists( "cmplz_admin" ) ) {
 				COMPLIANZ::$cookie_admin->upgrade_active_policy_id();
 			}
 
+			if (  $prev_version
+				  && version_compare( $prev_version, '4.9.7', '<' )
+			) {
+				update_option('cmplz_show_terms_conditions_notice', time());
+			}
+
 			/**
 			 * upgrade to new category field
 			 */
@@ -573,28 +608,26 @@ if ( ! class_exists( "cmplz_admin" ) ) {
 						$banner = new CMPLZ_COOKIEBANNER( $banner_item->ID, false );
 						$banner->banner_version ++;
 
-						$sql     = "select popup_background_color, border_color, popup_text_color, slider_background_color, slider_bullet_color, " .
-						           "slider_background_color_inactive, accept_all_background_color, accept_all_border_color, accept_all_text_color, " .
-						           "functional_background_color, functional_border_color, functional_text_color, button_background_color, button_text_color " .
-						           "from {$wpdb->prefix}cmplz_cookiebanners where ID = {$banner_item->ID}";
-						$results = $wpdb->get_results( $sql );
+						$sql    = "select * from {$wpdb->prefix}cmplz_cookiebanners where ID = {$banner_item->ID}";
+						$result = $wpdb->get_row( $sql );
 
-						if ( isset( $results[0] ) ) {
-							$banner->colorpalette_background['color']           = $results[0]->popup_background_color;
-							$banner->colorpalette_background['border']          = $results[0]->border_color;
-							$banner->colorpalette_text['color']                 = $results[0]->popup_text_color;
-							$banner->colorpalette_toggles['background']         = $results[0]->slider_background_color;
-							$banner->colorpalette_toggles['bullet']             = $results[0]->slider_bullet_color;
-							$banner->colorpalette_toggles['inactive']           = $results[0]->slider_background_color_inactive;
-							$banner->colorpalette_button_accept['background']   = $results[0]->accept_all_background_color;
-							$banner->colorpalette_button_accept['border']       = $results[0]->accept_all_border_color;
-							$banner->colorpalette_button_accept['text']         = $results[0]->accept_all_text_color;
-							$banner->colorpalette_button_deny['background']     = $results[0]->functional_background_color;
-							$banner->colorpalette_button_deny['border']         = $results[0]->functional_border_color;
-							$banner->colorpalette_button_deny['text']           = $results[0]->functional_text_color;
-							$banner->colorpalette_button_settings['background'] = $results[0]->button_background_color;
-							$banner->colorpalette_button_settings['border']     = $results[0]->functional_border_color;
-							$banner->colorpalette_button_settings['text']       = $results[0]->button_text_color;
+						if ( $result ) {
+							$banner->colorpalette_background['color']           = $result->popup_background_color;
+							$banner->colorpalette_background['border']          = $result->border_color;
+							$banner->colorpalette_text['color']                 = $result->popup_text_color;
+							$banner->colorpalette_toggles['background']         = $result->slider_background_color;
+							$banner->colorpalette_toggles['bullet']             = $result->slider_bullet_color;
+							$banner->colorpalette_toggles['inactive']           = $result->slider_background_color_inactive;
+							$banner->colorpalette_button_accept['background']   = $result->accept_all_background_color;
+							$banner->colorpalette_button_accept['border']       = $result->accept_all_border_color;
+							$banner->colorpalette_button_accept['text']         = $result->accept_all_text_color;
+							$banner->colorpalette_button_deny['background']     = $result->functional_background_color;
+							$banner->colorpalette_button_deny['border']         = $result->functional_border_color;
+							$banner->colorpalette_button_deny['text']           = $result->functional_text_color;
+							$banner->colorpalette_button_settings['background'] = $result->button_background_color;
+							$banner->colorpalette_button_settings['border']     = $result->functional_border_color;
+							$banner->colorpalette_button_settings['text']       = $result->button_text_color;
+							$banner->custom_css                                 = $result->custom_css . "\n\n" . $result->custom_css_amp;
 
 							$banner->save();
 						}
@@ -687,6 +720,7 @@ if ( ! class_exists( "cmplz_admin" ) ) {
 					'admin_url'    => admin_url( 'admin-ajax.php' ),
 					'progress'     => $progress,
 					'syncProgress' => $sync_progress,
+					'saved_message' => __("Saved successfully", "complianz-gdpr"),
 				)
 			);
 		}
@@ -743,48 +777,50 @@ if ( ! class_exists( "cmplz_admin" ) ) {
 			$defaults = array(
 				'cache' => true,
 				'status' => 'all',
-				'ignore_warnings' => array()
 			);
 			$args = wp_parse_args($args, $defaults);
 			$cache = $args['cache'];
-			$ignore_warnings = $args['ignore_warnings'];
-
 			$warnings = $cache ? get_transient( 'complianz_warnings' ) : false;
 
 			//re-check if there are no warnings, or if the transient has expired
 			if ( ! $warnings || count( $warnings ) > 0 ) {
 				$warning_type_defaults = array(
-					'conditions' => array(),
-					'relation' => 'AND',
+					'warning_condition' => '_true_',
+					'success_conditions' => array(),
+					'relation' => 'OR',
 				);
 
 				$warning_types = apply_filters( 'cmplz_warnings_types', COMPLIANZ::$config->warning_types );
-
 				foreach ($warning_types as $id => $warning_type) {
 					$warning_types[$id] = wp_parse_args($warning_type, $warning_type_defaults );
 				}
-
+				$dismissed_warnings = get_option('cmplz_dismissed_warnings', array() );
 				foreach ( $warning_types as $id => $warning ) {
-					$dismissed_warnings = get_option('cmplz_dismissed_warnings', array() );
-					if ( in_array( $id, $dismissed_warnings) ) continue;
+					if ( in_array( $id, $dismissed_warnings) ) {
+						continue;
+					}
+
+					$show_warning = $this->validate_function($warning['warning_condition']);
+					if ( !$show_warning ) {
+						continue;
+					}
 
 					$relation = $warning['relation'];
 					if ( $relation === 'AND' ) {
-						$error = TRUE;
+						$success = TRUE;
 					} else {
-						$error = FALSE;
+						$success = FALSE;
 					}
-
-					foreach ( $warning[ 'conditions']  as $func) {
+					foreach ( $warning[ 'success_conditions']  as $func) {
 						$condition = $this->validate_function($func);
 						if ( $relation === 'AND' ) {
-							$error = $error && $condition;
+							$success = $success && $condition;
 						} else {
-							$error = $error || $condition;
+							$success = $success || $condition;
 						}
 					}
 
-					if ( $error ) {
+					if ( !$success ) {
 						if ( isset( $warning['open']) ) {
 							$warning['message'] = $warning['open'];
 							$warning['status'] = 'open';
@@ -808,6 +844,9 @@ if ( ! class_exists( "cmplz_admin" ) ) {
 				if ($args['status'] !== 'all' ) {
 					$filter_statuses = is_array($args['status']) ? $args['status'] : array($args['status']);
 					foreach ($warnings as $id => $warning ) {
+						//only for upgrade from <5.0
+						if ( !isset($warning['status']) ) continue;
+
 						if ( !in_array( $warning['status'], $filter_statuses) ) {
 							unset( $warnings[$id] );
 						}
@@ -819,6 +858,9 @@ if ( ! class_exists( "cmplz_admin" ) ) {
 				$open = array();
 				$urgent = array();
 				foreach ($warnings as $key => $warning){
+					//prevent notices on upgrade to 5.0
+					if ( !isset( $warning['status'])) continue;
+
 					if ($warning['status']==='urgent') {
 						$urgent[$key] = $warning;
 					} else if ($warning['status']==='open') {
@@ -893,7 +935,10 @@ if ( ! class_exists( "cmplz_admin" ) ) {
 		}
 
 
-		// Register a custom menu page.
+		/**
+		 * Register our menu's
+		 */
+
 		public function register_admin_page() {
 			if ( ! cmplz_user_can_manage() ) {
 				return;
@@ -970,14 +1015,17 @@ if ( ! class_exists( "cmplz_admin" ) ) {
 
 		}
 
-
+		/**
+		 * Show the wizard page
+		 */
 		public function wizard_page() {
 			?>
 			<div class="wrap">
 				<?php if ( apply_filters( 'cmplz_show_wizard_page', true ) ) {
 					COMPLIANZ::$wizard->wizard( 'wizard' );
 				} else {
-					cmplz_notice( __( 'Your license needs to be activated to unlock the wizard', 'complianz-gdpr' ), 'warning' );
+					$link = '<a href="'.add_query_arg(array('page'=>'cmplz-settings#license'), admin_url('admin.php')).'">';
+					cmplz_admin_notice( sprintf(__( 'Your license needs to be %sactivated%s to unlock the wizard', 'complianz-gdpr' ), $link, '</a>' ));
 				} ?>
 			</div>
 			<?php
@@ -1006,7 +1054,7 @@ if ( ! class_exists( "cmplz_admin" ) ) {
 		}
 
 		/**
-		 * Generate the dasbhoard page
+		 * Generate the dashboard page
 		 */
 
 		public function dashboard() {

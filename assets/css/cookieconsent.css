@@ -56,10 +56,6 @@
 .cc-revoke {
   padding: 0.5em;
 }
-.cc-header {
-  font-size: 18px;
-  font-weight: 700;
-}
 .cc-btn,
 .cc-close,
 .cc-link,
@@ -283,6 +279,15 @@
   Make sure the text stays within the banne
    */
 }
+#cc-window .cc-header {
+  font-size: 18px;
+  font-weight: 700;
+  width: 100%;
+  margin-bottom: 10px;
+}
+#cc-window.cc-banner .cc-header {
+  display: none;
+}
 #cc-window.cc-floating {
   min-width: 468px;
 }
@@ -383,15 +388,11 @@
   float: initial;
   margin: 15px 0 0 0;
 }
+#cc-window.cc-theme-edgeless .cc-header {
+  margin: 1em 1em 0 1.7em;
+}
 #cc-window.cc-theme-edgeless .cc-btn {
   border: 0;
-}
-#cc-window.cc-theme-minimal .cc-btn {
-  border-radius: 5px;
-}
-#cc-window.cc-window.cc-theme-minimal .cc-btn.cc-accept-all {
-  border-radius: 5px;
-  border-width: 1px;
 }
 #cc-window.cmplz-hide-cats {
   display: none;
@@ -457,12 +458,6 @@
 }
 .cc-window.cc-theme-minimal:not(.cc-floating) .cc-message {
   text-align: center;
-}
-.cc-window.cc-theme-minimal .cc-btn.cc-allow,
-.cc-window.cc-theme-minimal .cc-btn.cc-save,
-.cc-window.cc-theme-minimal .cc-btn.cc-dismiss {
-  border-radius: 5px;
-  border-width: 1px;
 }
 .cc-window.cc-center {
   position: fixed;

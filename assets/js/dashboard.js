@@ -1,5 +1,8 @@
 jQuery(document).ready(function ($) {
 	'use strict';
+	var cmplz_loader = '<div class="cmplz-loader"><div class="rect1"></div><div class="rect2"></div><div class="rect3"></div><div class="rect4"></div><div class="rect5"></div></div>';
+
+
 	$(document).on('click', '.cmplz-dismiss-warning', function(){
 		var warning_id = $(this).data('warning_id');
 		var btn = $(this);
@@ -24,6 +27,33 @@ jQuery(document).ready(function ($) {
 		});
 	});
 
+	$(document).on('change', '#cmplz_selected_region', function(){
+		var data = {};
+		data['region'] = $('#cmplz_selected_region').val();
+		cmplzLoadGridBlock(data, $(this));
+	});
+
+	function cmplzLoadGridBlock(data, obj) {
+		var template = obj.closest('.item-container').data('template');
+		var container = obj.closest('.item-container').find('.item-content');
+		data['action'] = 'cmplz_load_gridblock';
+		data['template'] = template;
+
+		container.html('<div class="cmplz-skeleton"></div>' );
+		$.ajax({
+			type: "GET",
+			url: complianz_admin.admin_url,
+			dataType: 'json',
+			data: data,
+			success: function (response) {
+				console.log(response);
+				if (response.success) {
+					container.html(response.html);
+				}
+			}
+		});
+	}
+
 	$(document).on('click', '.cmplz-task', function(){
 		var status = 'remaining';
 		if ($(this).find('.cmplz-task-count').hasClass('cmplz-all')) {
@@ -31,10 +61,9 @@ jQuery(document).ready(function ($) {
 		}
 		if ( $('.cmplz-'+status).closest('.cmplz-task').hasClass('active')) return;
 		var container = $(this).closest('.item-container').find('.item-content');
-		var cmplz_loader = '<div class="cmplz-loader"><div class="rect1"></div><div class="rect2"></div><div class="rect3"></div><div class="rect4"></div><div class="rect5"></div></div>';
 
-		container.html(cmplz_loader );
-		// container.html('<div class="cmplz-skeleton"></div>' );
+		//container.html(cmplz_loader );
+		 container.html('<div class="cmplz-skeleton"></div>' );
 		$.ajax({
 			type: "GET",
 			url: complianz_admin.admin_url,
@@ -53,6 +82,11 @@ jQuery(document).ready(function ($) {
 						$('.cmplz-all').closest('.cmplz-task').removeClass('active');
 						$('.cmplz-remaining').closest('.cmplz-task').addClass('active');
 					}
+					//fire this to trigger the scroll plugin
+					window.document.dispatchEvent(new Event("DOMContentLoaded", {
+						bubbles: true,
+						cancelable: true
+					}));
 				}
 			}
 		});

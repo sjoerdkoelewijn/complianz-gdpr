@@ -9,11 +9,15 @@ $this->steps = apply_filters('cmplz_steps',array(
 				"title" => __( "General", 'complianz-gdpr' ),
 				'sections' => array(
 					1 => array(
-						'title' => __( 'Visitors', 'complianz-gdpr' ),
-						'intro' => '<p>'. sprintf(_x('The Complianz Wizard will guide you through the necessary steps to configure your website for privacy legislation around the world. Use the %smanual%s for this wizard if you need help during this process. You can also find a (?) after most questions for more info on this specific question.','intro first step', 'complianz-gdpr'),'<a target="_blank" href="https://complianz.io/manual/">', '</a>').'<br>'.
-						           _x('The answers in the first step of the wizard are needed to configure your documents and consent banner specifically to your needs.','intro first step', 'complianz-gdpr').'</p><p>'.
-						           sprintf(_x('Please note that you can always save and finish the wizard later, use our %sdocumentation%s for additional information or log a %ssupport ticket%s if you need our assistance.', 'intro first step', 'complianz-gdpr'),'<a target="_blank" href="https://complianz.io/documentation">', '</a>','<a target="_blank" href="https://complianz.io/support">', '</a>').'</p>',
-					),
+				    'title' => __('Visitors', 'complianz-gdpr'),
+				    'intro' => '<p>'. _x('The Complianz Wizard will guide you through the necessary steps to configure your website for privacy legislation around the world. We designed the wizard to be comprehensible, without making concessions in legal compliance.','intro first step', 'complianz-gdpr') .'</p>' .
+				               _x('There are a few things to assist you during configuration:','intro first step', 'complianz-gdpr') .'<ul>'.
+				               '<li>' . _x('Hover over the question mark behind certain questions for more information.', 'intro first step', 'complianz-gdpr').'</li>' .
+		                   '<li>' . _x('Important notices and relevant articles are shown in the right column.', 'intro first step', 'complianz-gdpr').'</li>' .
+		                   '<li>' . sprintf(_x('Our %sinstructions manual%s contains more detailed background information about every section and question in the wizard, if you need more information','intro first step', 'complianz-gdpr'),'<a target="_blank" href="https://complianz.io/manual">', '</a>') .'</li>' .
+		                   '<li>' . sprintf(_x('You can always %slog a support ticket%s if you need further assistance.','intro first step', 'complianz-gdpr'),'<a target="_blank" href="https://wordpress.org/support/plugin/complianz-gdpr/">', '</a>') .'</li></ul>',
+
+			    ),
 					2 => array(
 						'id'    => 'general',
 						'title' => __( 'Documents', 'complianz-gdpr' ),
@@ -54,8 +58,8 @@ $this->steps = apply_filters('cmplz_steps',array(
 						'title' => __( 'Cookie scan', 'complianz-gdpr' ),
 						'intro' =>
                             '<p>'._x( 'Complianz will scan several pages of your website for first-party cookies and known third-party scripts. The scan will be recurring monthly to keep you up-to-date!',
-								'intro scan', 'complianz-gdpr' ). '</p>'
-                            .'<p>'._x( 'For more information, ', 'complianz-gdpr').'<a href="TODO">'._x('read our 5 tips about the cookie scan.', 'complianz-gdpr').'</a></p>',
+								'intro scan', 'complianz-gdpr' ) . '&nbsp;' .
+                                  _x( 'For more information, ', 'complianz-gdpr').'<a href="https://complianz.io/cookie-scan-results/" target="_blank">'. _x('read our 5 tips about the cookie scan.', 'complianz-gdpr').'</a></p>',
 					),
 					2 => array(
 						'title' => __( 'Statistics', 'complianz-gdpr' ),

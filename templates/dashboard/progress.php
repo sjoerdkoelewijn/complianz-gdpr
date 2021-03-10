@@ -31,7 +31,6 @@
 			$warning_args = array(
 				'cache' => false,
 			);
-			_log($_GET);
 			if ( isset($_GET['status']) && $_GET['status'] === 'remaining' ) {
 				$warning_args['status'] = array('urgent', 'open');
 			}

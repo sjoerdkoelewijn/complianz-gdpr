@@ -61,27 +61,7 @@ if ( ! class_exists( "cmplz_review" ) ) {
 				return;
 			}
 			?>
-			<style>
-				.cmplz-container {
-					display: flex;
-					padding: 12px;
-				}
 
-				.cmplz-container .dashicons {
-					margin-left: 10px;
-					margin-right: 5px;
-				}
-
-				.cmplz-review-image img {
-					margin-top: 0.5em;
-				}
-
-				.cmplz-buttons-row {
-					margin-top: 10px;
-					display: flex;
-					align-items: center;
-				}
-			</style>
 			<div id="message"
 			     class="updated fade notice is-dismissible cmplz-review really-simple-plugins"
 			     style="border-left:4px solid #333">

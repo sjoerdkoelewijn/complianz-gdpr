@@ -1,5 +1,26 @@
 jQuery(document).ready(function ($) {
     'use strict';
+	$(document).on('click', '.cmplz-copy-shortcode', function () {
+		var element_id = $(this).closest('.shortcode-container').find('.cmplz-shortcode').attr('id');
+		var element = document.getElementById(element_id);
+		var sel = window.getSelection();
+		sel.removeAllRanges();
+		var range = document.createRange();
+		range.selectNodeContents(element);
+		sel.addRange(range);
+		var success;
+		try {
+			success = document.execCommand("copy");
+		} catch (e) {
+			success = false;
+		}
+
+		if (success) {
+			var icon = $(this).find('.cmplz-tooltip-icon');
+			icon.addClass('copied');
+			setTimeout(function(){ icon.removeClass('copied') }, 1000);
+		}
+	});
 
 	$(document).on('click', '.cmplz-download-document', function () {
 		var btn =  $(this);
@@ -103,13 +124,13 @@ jQuery(document).ready(function ($) {
         //close all open panels
 
         if (content.is(':hidden')){
-            icon_toggle.toggleClass('dashicons-arrow-down');
-            icon_toggle.toggleClass('dashicons-arrow-right');
+            icon_toggle.toggleClass('dashicons-arrow-down-alt2');
+            icon_toggle.toggleClass('dashicons-arrow-right-alt2');
             content.slideDown("fast");
         } else {
             content.slideUp( 'fast');
-            icon_toggle.toggleClass('dashicons-arrow-right');
-            icon_toggle.toggleClass('dashicons-arrow-down');
+            icon_toggle.toggleClass('dashicons-arrow-right-alt2');
+            icon_toggle.toggleClass('dashicons-arrow-down-alt2');
         }
     });
 
@@ -310,7 +331,6 @@ jQuery(document).ready(function ($) {
                     if ($('select[name=' + question + ']').length) {
                         value = Array($('select[name=' + question + ']').val());
                     }
-					console.log("input[name='" + question + "[" + condition_answer + "]" + "']");
                     if ($("input[name='" + question + "[" + condition_answer + "]" + "']").length) {
 
                         if ($("input[name='" + question + "[" + condition_answer + "]" + "']").is(':checked')) {
@@ -428,7 +448,6 @@ jQuery(document).ready(function ($) {
 
                         } else {
                             progressBar.css({width: progress + '%'});
-                            console.log('loading for cookie scan: '+next_page);
                             $("#cmplz_cookie_scan_frame").attr('src', next_page);
 
                             window.setTimeout(checkIframeLoaded, cmplz_interval);
@@ -619,7 +638,6 @@ jQuery(document).ready(function ($) {
      * Keep sync button in sync with disabled state for both cookies and services
      */
     $(document).on('change', '.cmplz_sync', function(){
-        console.log('changed sync');
         var container = $(this).closest('.cmplz-field');
         var disabled = false;
         if ($(this).is(":checked")) disabled=true;
@@ -908,7 +926,7 @@ jQuery(document).ready(function ($) {
                         var name = container.find('.cmplz_name').val();
                         var new_title = title.text().replace(/\".*\"/, '"' + name + '"');
                         title.text(new_title);
-                        btn.parent().append('<div class="cmplz-panel cmplz-success cmplz-remove-after-change">Changes saved successfully</div>');
+                        btn.parent().append('<div class="cmplz-panel cmplz-success cmplz-remove-after-change">'+complianz_admin.saved_message+'</div>');
                     }
 
                     btn.html(btnHtml);
@@ -1130,8 +1148,6 @@ jQuery(document).ready(function ($) {
 		var consenttype = $('select[name=cmplz_consenttype]').val();
 		var category = $('select[name=cmplz_category]').val();
 
-		console.log(consenttype);
-		console.log(category);
 		$.ajax({
 			type: "get",
 			dataType: "json",
@@ -1144,7 +1160,6 @@ jQuery(document).ready(function ($) {
 			success: function (response) {
 				if (response.success == true) {
 					var i = 0;
-					console.log(config.data.datasets);
 					response.data.datasets.forEach(function (dataset) {
 						if (config.data.datasets.hasOwnProperty(i)) {
 							config.data.datasets[i] = dataset;

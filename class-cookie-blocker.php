@@ -237,8 +237,9 @@ if ( ! class_exists( 'cmplz_cookie_blocker' ) ) {
 			 *
 			 *
 			 * */
-			$iframe_pattern = '/<(iframe)[^>].*?src=[\'"](http:\/\/|https:\/\/|\/\/)' . $url_pattern . '[\'"].*?>.*?<\/iframe>/is';
-
+			//the iframes URL pattern allows for a space, which may be included in a Google Maps embed.
+			$url_pattern_iframes = '([\w.,;@?^=%&:()\/~+#!\- *]*?)';
+			$iframe_pattern = '/<(iframe)[^>].*?src=[\'"](http:\/\/|https:\/\/|\/\/)' . $url_pattern_iframes . '[\'"].*?>.*?<\/iframe>/is';
 			if ( preg_match_all( $iframe_pattern, $output, $matches, PREG_PATTERN_ORDER ) ) {
 				foreach ( $matches[0] as $key => $total_match ) {
 					$iframe_src = $matches[2][ $key ] . $matches[3][ $key ];
@@ -423,7 +424,7 @@ if ( ! class_exists( 'cmplz_cookie_blocker' ) ) {
 			//add a marker so we can recognize if this function is active on the front-end
 			$output = str_replace( "<body ", '<body data-cmplz=1 ', $output );
 
-			return $output;
+			return apply_filters('cmplz_cookie_blocker_output', $output);
 		}
 
 

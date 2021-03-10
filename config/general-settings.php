@@ -41,57 +41,22 @@ $this->fields = $this->fields + array(
             'translatable' => true,
             'table'        => true,
             'label'        => __( "Blocked content text", 'complianz-gdpr' ),
-            'default'      => _x( 'Click to accept marketing cookies and enable this content',
-                'Accept cookies on blocked content', 'complianz-gdpr' ),
-            'comment'         => __( 'The blocked content text appears when for example a Youtube video is embedded.',
-                'complianz-gdpr' ),
+            'default'      => _x( 'Click to accept marketing cookies and enable this content', 'Accept cookies on blocked content', 'complianz-gdpr' ),
+            'tooltip'         => __( 'The blocked content text appears when for example a Youtube video is embedded.', 'complianz-gdpr' ),
             'condition'    => array(
                 'disable_cookie_block' => false,
             )
-        ),
-
-        'notification_email_subject' => array(
-            'step'               => 'general',
-            'source'             => 'settings',
-            'type'               => 'text',
-            'label'              => __( "Notification email subject",
-                'complianz-gdpr' ),
-            'default'            => __( 'Your request has been processed',
-                'complianz-gdpr' ),
-            'table'              => true,
-            'callback_condition' => array(
-                //'regions' => 'us',
-                'purpose_personaldata' => 'selling-data-thirdparty',
-            ),
-        ),
-
-        'notification_email_content' => array(
-            'step'               => 'general',
-            'source'             => 'settings',
-            'type'               => 'wysiwyg',
-            'label'              => __( "Notification email content",
-                'complianz-gdpr' ),
-            'default'            => __( 'Hi {name}', 'complianz-gdpr' )
-                . "<br><br>"
-                . __( 'Your request has been processed successfully.',
-                    'complianz-gdpr' ) . "<br><br>" . _x( 'Regards,',
-                    'email signature', 'complianz-gdpr' )
-                . '<br><br>{blogname}',
-            'table'              => true,
-            'callback_condition' => array(
-                //'regions' => 'us',
-                'purpose_personaldata' => 'selling-data-thirdparty',
-            ),
         ),
 
         'enable_cookieblocker_ajax' => array(
             'step'     => 'general',
             'source'   => 'settings',
             'type'     => 'checkbox',
-            'label'    => __( "Enable cookie blocker for ajax loaded content", 'complianz-gdpr' ),
+            'label'    => __( "Enable cookie blocker for ajax loaded content", 'complianz-gdpr'),
             'table'    => true,
             'disabled' => false,
             'default'  => false,
+						'tooltip'  => __( "When content is loaded with ajax, for example with a load more button or lightbox, this option could help blocking the service correctly", 'complianz-gdpr' ),
         ),
 
 		'a_b_testing_duration' => array(
@@ -123,8 +88,7 @@ $this->fields = $this->fields + array(
             'label'   => __( "Use document CSS by Complianz", 'complianz-gdpr' ),
             'table'   => true,
             'default' => true,
-            'comment'    => __( "Disable to let your theme take over.",
-                'complianz-gdpr' ),
+            'tooltip'    => __( "Disable to let your theme take over.", 'complianz-gdpr' ),
         ),
 
         'use_custom_document_css' => array(
@@ -134,8 +98,7 @@ $this->fields = $this->fields + array(
             'label'   => __( "Add custom document CSS", 'complianz-gdpr' ),
             'table'   => true,
             'default' => false,
-            'tooltip' => __( "Enable if you want to add custom CSS for the documents",
-                'complianz-gdpr' ),
+            'tooltip' => __( "Enable if you want to add custom CSS for the documents", 'complianz-gdpr' ),
         ),
 
         'notification_from_email' => array(
@@ -148,11 +111,44 @@ $this->fields = $this->fields + array(
             'help'               => __( "When emails are sent, you can choose the sender email address here. Please note that it should have this website's domain as sender domain, otherwise the server might block the email from being sent.",
                 'complianz-gdpr' ),
             'table'              => true,
+            'tooltip' => __( "E-mail address used for Do Not Sell My Personal Information email notifications.", 'complianz-gdpr' ),
             'callback_condition' => array(
-                //'regions' => 'us',
                 'purpose_personaldata' => 'selling-data-thirdparty',
             ),
         ),
+		'notification_email_subject' => array(
+			'step'               => 'general',
+			'source'             => 'settings',
+			'type'               => 'text',
+			'label'              => __( "Notification email subject",
+				'complianz-gdpr' ),
+			'default'            => __( 'Your request has been processed',
+				'complianz-gdpr' ),
+			'table'              => true,
+			'tooltip' => __( "Subject used for Do Not Sell My Personal Information email notifications.", 'complianz-gdpr' ),
+			'callback_condition' => array(
+				'purpose_personaldata' => 'selling-data-thirdparty',
+			),
+		),
+
+		'notification_email_content' => array(
+			'step'               => 'general',
+			'source'             => 'settings',
+			'type'               => 'editor',
+			'label'              => __( "Notification email content",
+				'complianz-gdpr' ),
+			'default'            => __( 'Hi {name}', 'complianz-gdpr' )
+			                        . "<br><br>"
+			                        . __( 'Your request has been processed successfully.',
+					'complianz-gdpr' ) . "<br><br>" . _x( 'Regards,',
+					'email signature', 'complianz-gdpr' )
+			                        . '<br><br>{blogname}',
+			'table'              => true,
+			'tooltip' => __( "Email content used for Do Not Sell My Personal Information email notifications.", 'complianz-gdpr' ),
+			'callback_condition' => array(
+				'purpose_personaldata' => 'selling-data-thirdparty',
+			),
+		),
 
         // ---------------- Cookie Blocker ----------------- //
 
@@ -163,7 +159,7 @@ $this->fields = $this->fields + array(
 			'table'   => true,
 			'label'   => __( "Enable safe mode", 'complianz-gdpr' ),
 			'default' => false,
-			'comment'    => sprintf( __( 'When safe mode is enabled, all integrations will be disabled temporarily, please read %sthese instructions%s to debug the issue or ask support if needed.',
+			'help'    => sprintf( __( 'When safe mode is enabled, all integrations will be disabled temporarily, please read %sthese instructions%s to debug the issue or ask support if needed.',
 				'complianz-gdpr' ),
 				'<a  target="_blank" href="https://complianz.io/debugging-issues/">', '</a>' )
 
@@ -177,7 +173,7 @@ $this->fields = $this->fields + array(
 			'label'     => __( "Disable placeholder insertion",
 				'complianz-gdpr' ),
 			'default'   => false,
-			'comment'      => __( "If you experience styling issues with videos or iFrames you can disable the placeholder insertion, which in some themes can conflict with theme styling.",
+			'tooltip'      => __( "If you experience styling issues with videos or iFrames you can disable the placeholder insertion, which in some themes can conflict with theme styling.",
 				'complianz-gdpr' ),
 			'condition' => array(
 				'disable_cookie_block' => false,
@@ -227,10 +223,9 @@ $this->fields = $this->fields + array(
 			'post_get' => 'get',
 			'label'    => __( "Export", 'complianz-gdpr' ),
 			'table'    => true,
-			'comment'  => __( 'You can use this to export your settings to another site',
+			'tooltip'  => __( 'You can use this to export your settings to another site',
 				'complianz-gdpr' ),
 		),
-
 
 		'import_settings' => array(
             'step'     => 'data',
@@ -278,7 +273,7 @@ $this->fields = $this->fields + array(
             'type'     => 'button',
             'action'   => 'cmplz_restart_tour',
             'post_get' => 'post',
-            'label'    => __( "Restart", 'complianz-gdpr' ),
+            'label'    => __( "Restart plugin tour", 'complianz-gdpr' ),
             'table'    => true,
         ),
 
@@ -287,7 +282,7 @@ $this->fields = $this->fields + array(
             'source'   => 'settings',
             'type'     => 'checkbox',
             'label'    => __( "Disable notifications", 'complianz-gdpr' ),
-            'comment'  => __( 'Disable all plus ones and warnings on your dashboard.',
+            'tooltip'  => __( 'Disable all plus ones and warnings on your dashboard.',
                 'complianz-gdpr' ),
             'table'    => true,
             'disabled' => false,
@@ -303,7 +298,7 @@ $this->fields = $this->fields + array(
             'type'      => 'css',
             'label'     => __( "Custom document CSS", 'complianz-gdpr' ),
             'default'   => '#cmplz-document h2 {} /* titles in complianz documents */'
-                . "\n" . '#cmplz-document .subtitle {} /* subtitles */'
+                . "{} /* subtitles */" . '#cmplz-document .subtitle'
                 . "\n" . '#cmplz-document h2.annex{} /* titles in annexes */'
                 . "\n" . '#cmplz-document .subtitle.annex{} /* subtitles in annexes */'
                 . "\n" . '#cmplz-document, #cmplz-document p, #cmplz-document span, #cmplz-document li {} /* text */'

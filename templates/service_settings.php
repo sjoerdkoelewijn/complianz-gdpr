@@ -48,7 +48,7 @@
     <div class="cmplz-multiple-field-button-footer">
         <button class="button cmplz-edit-item button-primary" type="button" data-action="save" data-type="service" name="cmplz-save-item" ><?php _e('Save','complianz-gdpr')?></button>
 
-        <button class="button cmplz-edit-item button-red" type="button" data-action="delete" data-type="service"
+        <button class="button cmplz-edit-item button-primary button-red" type="button" data-action="delete" data-type="service"
                 name="cmplz_remove_item"><?php _e("Delete", 'complianz-gdpr') ?></button>
     </div>
 

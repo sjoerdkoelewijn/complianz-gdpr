@@ -29,6 +29,17 @@ $cmplz_integrations_list = apply_filters( 'cmplz_integrations', array(
 			'label'                => 'Advanced noCaptcha & invisible Captcha',
 			'firstparty_marketing' => false,
 	),
+	'theeventscalendar' => array(
+			'constant_or_function' => 'TRIBE_EVENTS_FILE',
+			'label'                => 'The Events Calendar',
+			'firstparty_marketing' => false,
+	),
+
+//	'ultimate-addons-elementor' => array(
+//			'constant_or_function' => 'UAEL_FILE',
+//			'label'                => 'Ultimate Addons for Elementor',
+//			'firstparty_marketing' => false,
+//	),
 
 	'invisible-recaptcha' => array(
 			'constant_or_function' => 'InvisibleReCaptcha',
@@ -36,9 +47,21 @@ $cmplz_integrations_list = apply_filters( 'cmplz_integrations', array(
 			'firstparty_marketing' => false,
 	),
 
+//	'novo-map' => array(
+//			'constant_or_function' => 'NOVO_MAP_VERSION',
+//			'label'                => 'Novo-Map',
+//			'firstparty_marketing' => false,
+//	),
+
 	'citadela-directory' => array(
 			'constant_or_function' => 'CITADELA_DIRECTORY_LITE_PLUGIN',
 			'label'                => 'Citadela Directory',
+			'firstparty_marketing' => false,
+	),
+
+	'elementor' => array(
+			'constant_or_function' => 'ELEMENTOR_VERSION',
+			'label'                => 'Elementor',
 			'firstparty_marketing' => false,
 	),
 
@@ -584,7 +607,6 @@ function cmplz_notify_of_plugin_integrations( $warnings ){
 
 	return $warnings;
 }
-
 add_filter( 'cmplz_warning_types', 'cmplz_notify_of_plugin_integrations' );
 
 
@@ -606,8 +628,6 @@ function cmplz_unset_placeholder_hooks() {
 				"cmplz_{$service}_placeholder" );
 		}
 	}
-
-
 }
 
 /**

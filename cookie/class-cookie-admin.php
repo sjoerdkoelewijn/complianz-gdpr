@@ -51,7 +51,6 @@ if ( ! class_exists( "cmplz_cookie_admin" ) ) {
 			add_action( 'admin_init', array( $this, 'run_sync_on_update' ) );
 			add_action( 'admin_init', array( $this, 'ensure_cookies_in_all_languages' ) );
 			add_action( 'wp_ajax_store_detected_cookies', array( $this, 'store_detected_cookies' ) );
-			add_action( 'plugins_loaded', array( $this, 'resync' ), 11, 2 );
 			add_action( 'plugins_loaded', array( $this, 'rescan' ), 20, 2 );
 			add_action( 'plugins_loaded', array( $this, 'clear_cookies' ), 20, 2 );
 			add_action( 'cmplz_notice_statistics_script', array( $this, 'statistics_script_notice' ) );
@@ -1018,7 +1017,7 @@ if ( ! class_exists( "cmplz_cookie_admin" ) ) {
 			//if no syncable cookies are found, exit.
 			if ( $data['count'] == 0 ) {
 				update_option( 'cmplz_sync_cookies_complete', true );
-				$msg   = "";
+				$msg   = "No cookies";
 				$error = true;
 			}
 
@@ -1180,7 +1179,6 @@ if ( ! class_exists( "cmplz_cookie_admin" ) ) {
 				update_option( 'cmplz_sync_cookies_after_services_complete', true );
 			} else {
 				update_option( 'cmplz_sync_cookies_complete', true );
-
 			}
 
 			return $msg;
@@ -1804,7 +1802,7 @@ if ( ! class_exists( "cmplz_cookie_admin" ) ) {
 			// Banner under wp menu
 			if ( is_user_logged_in() ) {
 				wp_add_inline_style( 'cmplz-cookie', '.cc-window.cc-top{top:32px;}' );
-				wp_add_inline_script( 'jquery', '
+				wp_add_inline_script( 'cmplz-banner-customization', '
                 jQuery(document).ready(function ($) {
                     setTimeout(function () {
                         $(".cc-revoke").addClass("cc-bottom");
@@ -3267,6 +3265,8 @@ if ( ! class_exists( "cmplz_cookie_admin" ) ) {
 					foreach ( $cookies as $name ) {
 						$html .= '<span>' . $name . '</span>';
 					}
+				} else {
+					$html .= '<span>' . __("Nothing found yet.", "complianz-gdpr") . '</span>';
 				}
 				$html .= '</div></div>';
 
@@ -3280,6 +3280,8 @@ if ( ! class_exists( "cmplz_cookie_admin" ) ) {
 					foreach ( $social_media as $key => $service ) {
 						$html .= '<span>' . COMPLIANZ::$config->thirdparty_socialmedia[ $service ] . '</span>';
 					}
+				} else {
+					$html .= '<span>' . __("Nothing found yet.", "complianz-gdpr") . '</span>';
 				}
 				$html .= '</div></div>';
 
@@ -3293,6 +3295,8 @@ if ( ! class_exists( "cmplz_cookie_admin" ) ) {
 					foreach ( $thirdparty as $key => $service ) {
 						$html .= '<span>' . COMPLIANZ::$config->thirdparty_services[ $service ] . '</span>';
 					}
+				} else {
+					$html .= '<span>' . __("Nothing found yet.", "complianz-gdpr") . '</span>';
 				}
 				$html .= '</div></div>';
 			}
@@ -3543,10 +3547,10 @@ if ( ! class_exists( "cmplz_cookie_admin" ) ) {
 							<input type="hidden" id="cmplz_language" data-type="cookie" value="<?php echo reset( $languages ) ?>">
 						<?php } ?>
 
-						<div class="cmplz-switch">
+						<label class="cmplz-switch">
 							<input name="cmplz_show_deleted" size="40" type="checkbox" value="1"/>
 							<span class="cmplz-slider cmplz-round"></span>
-						</div>
+						</label>
 						<span><?php _e( "Show deleted cookies", "complianz-gdpr" ) ?></span>
 					</div>
 					<div class="cmplz-label cmplz-sync-status">
@@ -3757,7 +3761,7 @@ if ( ! class_exists( "cmplz_cookie_admin" ) ) {
 			 * user can override detected settings in wizard
 			 */
 
-			if ( cmplz_get_value( 'consent_for_anonymous_stats' ) === 'yes' ) {
+			if ( $this->consent_required_for_anonymous_stats() && cmplz_get_value( 'consent_for_anonymous_stats' ) === 'yes' ) {
 				return true;
 			}
 
@@ -3774,6 +3778,24 @@ if ( ! class_exists( "cmplz_cookie_admin" ) ) {
 
 			//not stats required if privacy friendly
 			return apply_filters( 'cmplz_cookie_warning_required_stats', ! $privacy_friendly );
+		}
+
+		/**
+		 * Check if consent is required for anonymous statistics
+		 *
+		 * @return bool
+		 */
+
+		public function consent_required_for_anonymous_stats() {
+			if ( ! cmplz_has_region( 'eu' ) ) {
+				return false;
+			}
+			$uses_google = $this->uses_google_analytics()
+						   || $this->uses_google_tagmanager();
+
+			return $uses_google
+				   && ( cmplz_get_value( 'eu_consent_regions' ) === 'yes' )
+				   && $this->statistics_privacy_friendly();
 		}
 
 		/**
@@ -3799,7 +3821,6 @@ if ( ! class_exists( "cmplz_cookie_admin" ) ) {
 				}
 			}
 		}
-
 
 		/**
 		 * Determine if statistics are used in a privacy friendly way

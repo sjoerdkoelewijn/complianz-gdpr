@@ -10,6 +10,20 @@
   }
 }
 #cc-window {
+  .cc-header {
+	font-size: 18px;
+	font-weight: 700;
+	width: 100%;
+	margin-bottom: 10px;
+  }
+
+  //bottom or top
+  &.cc-banner {
+	.cc-header {
+	  display:none;
+	}
+  }
+
   &.cc-floating {
 	min-width: 468px;
   }
@@ -155,17 +169,13 @@
 	}
   }
 
-  &.cc-theme-edgeless .cc-btn {
-	border: 0;
-  }
-
-  &.cc-theme-minimal .cc-btn {
-	border-radius: 5px;
-  }
-
-  &.cc-window.cc-theme-minimal .cc-btn.cc-accept-all {
-	border-radius: 5px;
-	border-width: 1px;
+  &.cc-theme-edgeless {
+	.cc-header {
+	  margin:1em 1em 0 1.7em;
+	}
+	.cc-btn {
+	  border: 0;
+	}
   }
 
   &.cmplz-hide-cats {
@@ -261,12 +271,6 @@
 
 	&:not(.cc-floating) .cc-message {
 	  text-align: center;
-	}
-	.cc-btn {
-	  &.cc-allow, &.cc-save, &.cc-dismiss {
-		border-radius: 5px;
-		border-width: 1px;
-	  }
 	}
   }
 

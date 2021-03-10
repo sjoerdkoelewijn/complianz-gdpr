@@ -106,7 +106,7 @@ if ( ! class_exists( "cmplz_wizard" ) ) {
                 echo '</div>';
 
 				if ( COMPLIANZ::$cookie_admin->site_needs_cookie_warning() ) {
-					cmplz_notification( sprintf( __( "The cookie banner and cookie blocker are enabled. Please check your website if your configuration is working properly. Please read %sthese instructions%s to debug any issues while in safe mode. Safe mode is available under settings.", 'complianz-gdpr' ),
+					cmplz_sidebar_notice( sprintf( __( "The cookie banner and cookie blocker are enabled. Please check your website if your configuration is working properly. Please read %sthese instructions%s to debug any issues while in safe mode. Safe mode is available under settings.", 'complianz-gdpr' ),
                         '<a  target="_blank" href="https://complianz.io/debugging-manual">', '</a>'),
                         'warning');
 				}
@@ -382,9 +382,8 @@ if ( ! class_exists( "cmplz_wizard" ) ) {
 		 * @return int|bool
 		 */
 		public function get_next_not_empty_section( $page, $step, $section ) {
-			if ( ! COMPLIANZ::$field->step_has_fields( $page, $step,
-				$section )
-			) {
+
+			if ( ! COMPLIANZ::$field->step_has_fields( $page, $step, $section ) ) {
 				//some keys are missing, so we need to count the actual number of keys.
 				if ( isset( COMPLIANZ::$config->steps[ $page ][ $step ]['sections'] ) ) {
 					$n = array_keys( COMPLIANZ::$config->steps[ $page ][ $step ]['sections'] ); //<---- Grab all the keys of your actual array and put in another array
@@ -396,7 +395,6 @@ if ( ! class_exists( "cmplz_wizard" ) ) {
 				} else {
 					$section_count = $section + 1;
 				}
-
 				$section ++;
 
 				if ( $section_count > $this->total_sections( $page, $step ) ) {
@@ -551,6 +549,15 @@ if ( ! class_exists( "cmplz_wizard" ) ) {
             echo cmplz_get_template('admin_wrap.php', $args );
         }
 
+		/**
+		 * Generate menu
+		 * @param string $page
+		 * @param string $wizard_title
+		 * @param int $active_step
+		 * @param int $active_section
+		 *
+		 * @return false|string
+		 */
 		public function wizard_menu( $page, $wizard_title, $active_step, $active_section )
         {
             $args_menu['steps'] = "";
@@ -569,7 +576,7 @@ if ( ! class_exists( "cmplz_wizard" ) ) {
                 $args_menu['steps'] .= cmplz_get_template( 'wizard/step.php' , $args);
             }
 
-            $args_menu['percentage-complete'] = $this->wizard_percentage_complete(false);
+            $args_menu['percentage-complete'] = $this->wizard_percentage_complete();
             $args_menu['title'] = !empty( $wizard_title ) ? '<div class="cmplz-wizard-subtitle"><h2>' . $wizard_title . '</h2></div>': '' ;
 
             return cmplz_get_template( 'wizard/menu.php', $args_menu );
@@ -595,7 +602,7 @@ if ( ! class_exists( "cmplz_wizard" ) ) {
 
                     $active = ( $i == $active_section ) ? 'active' : '';
                     if ( $active == 'active' ) {
-                        $icon = cmplz_icon('arrow-right-alt2', 'success');
+                        $icon = cmplz_icon('arrow-right', 'success');
                     } else if ($this->required_fields_completed( $page, $step, $i )) {
                     	$icon = cmplz_icon('check', 'success');
                     }
@@ -732,8 +739,7 @@ if ( ! class_exists( "cmplz_wizard" ) ) {
 		 * */
 
 		public function section_is_empty( $page, $step, $section ) {
-			$section_compare = $this->get_next_not_empty_section( $page, $step,
-				$section );
+			$section_compare = $this->get_next_not_empty_section( $page, $step, $section );
 			if ( $section != $section_compare ) {
 				return true;
 			}
@@ -759,13 +765,18 @@ if ( ! class_exists( "cmplz_wizard" ) ) {
 
 			if ( strpos( $hook, 'cmplz-wizard' ) === false &&
 			     strpos( $hook, 'cmplz-cookiebanner' ) === false &&
-			     strpos( $hook, 'cmplz-script-center' ) === false &&
 			     strpos( $hook, 'cmplz-proof-of-consent' ) === false &&
+			     strpos( $hook, 'cmplz-script-center' ) === false &&
 			     strpos( $hook, 'cmplz-processing' ) === false &&
 			     strpos( $hook, 'cmplz-dataleak' ) === false &&
                  strpos( $hook, 'cmplz-settings' ) === false &&
 			     ( !is_network_admin() || strpos( $hook, 'complianz' ) === false)
 			) {
+				return;
+			}
+
+			//also skip the wizard for root pages of dataleaks and processing
+			if ( strpos( $hook, 'post_type' ) !== false ) {
 				return;
 			}
 
@@ -1088,55 +1099,25 @@ if ( ! class_exists( "cmplz_wizard" ) ) {
 		 * @return int
 		 * */
 
-		public function wizard_percentage_complete( $count_warnings = true )
+		public function wizard_percentage_complete( )
 		{
 			//store to make sure it only runs once.
 			if ( $this->percentage_complete !== false ) {
 				return $this->percentage_complete;
 			}
-			$total_fields     = 0;
-			$completed_fields = 0;
-			$total_steps      = $this->total_steps( 'wizard' );
-			for ( $i = 1; $i <= $total_steps; $i ++ ) {
-				$fields = COMPLIANZ::$config->fields( 'wizard', $i, false );
-				foreach ( $fields as $fieldname => $field ) {
-					//is field required
-					$required = isset( $field['required'] ) ? $field['required'] : false;
-					if ( ( isset( $field['condition'] ) || isset( $field['callback_condition'] ) ) && ! COMPLIANZ::$field->condition_applies( $field )
-					) {
-						$required = false;
-					}
-					if ( $required ) {
-						$value = cmplz_get_value( $fieldname, false, false, false );
-						$total_fields ++;
-						if ( ! empty( $value ) ) {
-							$completed_fields ++;
-						}
-					}
-				}
-			}
+			$args = array(
+				'cache' => false,
+				'status' => 'all',
+			);
+			$total_warnings     = count( COMPLIANZ::$admin->get_warnings( $args ) );
 
-			if ( $count_warnings ) {
-				$total_warnings     = count( COMPLIANZ::$config->warning_types );
-				$completed_warnings = $total_warnings - count( COMPLIANZ::$admin->get_warnings(array(
-						'cache' => false,
-						'ignore_warnings' => array('no-dnt'),
-					) ) );
-				$completed_fields   += $completed_warnings;
-				$total_fields       += $total_warnings;
-			}
+			$args = array(
+				'cache' => false,
+				'status' => 'completed',
+			);
+			$completed_warnings = count( COMPLIANZ::$admin->get_warnings( $args ) );
 
-			$pages = COMPLIANZ::$document->get_required_pages();
-			foreach ( $pages as $region => $region_pages ) {
-				foreach ( $region_pages as $type => $page ) {
-					if ( COMPLIANZ::$document->page_exists( $type, $region ) ) {
-						$completed_fields ++;
-					}
-					$total_fields ++;
-				}
-			}
-
-			$percentage = round( 100 * ( $completed_fields / $total_fields ) + 0.45 );
+			$percentage = round( 100 * ( $completed_warnings / $total_warnings ) + 0.45 );
 			$this->percentage_complete = $percentage;
 			return $percentage;
 		}

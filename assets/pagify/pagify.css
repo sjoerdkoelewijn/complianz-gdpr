@@ -19,4 +19,7 @@
   background-color: #000;
   color: #fff;
 }
+.cmplz-pagination a .cmplz-icon {
+  margin-top: 3px;
+}
 /*# sourceMappingURL=pagify.css.map */

@@ -20,8 +20,8 @@
 			cmplz_update_option( 'wizard', 'regions', array( $default => 1 ) );
 		}
 	}
-	$consenttypes = cmplz_get_used_consenttypes(true);
-	$default_consenttype = COMPLIANZ::$company->get_default_consenttype();
+	$consenttypes = apply_filters( 'cmplz_edit_banner_consenttypes',cmplz_get_used_consenttypes(true) );
+	$default_consenttype = apply_filters( 'cmplz_edit_banner_default_consenttype' ,COMPLIANZ::$company->get_default_consenttype() );
 	$controls = '<select name="cmplz_type"><option value="">'.__("Choose an option",'complianz-gdpr').'</option>';
 	foreach ($consenttypes as $consenttype_id => $consenttype){
 		$selected = $consenttype_id == $default_consenttype ? 'selected' : '';

@@ -17,10 +17,23 @@ if ( ! class_exists( "cmplz_proof_of_consent" ) ) {
 			}
 
 			add_action( 'admin_init', array( $this, 'force_snapshot_generation' ) );
+			add_action('admin_enqueue_scripts', array($this, 'admin_enqueue'));
+
 		}
 
 		static function this() {
 			return self::$_this;
+		}
+
+		/**
+		 * Enqueue back-end assets
+		 * @param $hook
+		 */
+		public function admin_enqueue($hook){
+			if (!isset($_GET['page']) || $_GET['page'] !== 'cmplz-proof-of-consent' ) return;
+			$min = (defined('SCRIPT_DEBUG') && SCRIPT_DEBUG) ? '' : '.min';
+			wp_register_style('cmplz-posttypes', cmplz_url . "assets/css/posttypes$min.css", false, cmplz_version);
+			wp_enqueue_style('cmplz-posttypes');
 		}
 
 		/**
@@ -235,7 +248,7 @@ if ( ! class_exists( "cmplz_proof_of_consent" ) ) {
 					});
 				});
 			</script>
-
+			<div class="wrap">
 			<div id="cookie-policy-snapshots" class="wrap cookie-snapshot">
 				<h1><?php _e( "Proof of consent", 'complianz-gdpr' ) ?></h1>
 				<p>
@@ -277,7 +290,7 @@ if ( ! class_exists( "cmplz_proof_of_consent" ) ) {
 				</form>
 				<?php do_action( 'cmplz_after_cookiesnapshot_list' ); ?>
 			</div>
-
+			</div>
 			<?php
 		}
 
@@ -326,11 +339,11 @@ if ( ! class_exists( "cmplz_proof_of_consent" ) ) {
                     'colorpalette_text',
                     'colorpalette_toggles',
                     'colorpalette_border_radius',
-                    'colorpalette_border_width',
+                    'border_width',
                     'colorpalette_button_accept',
                     'colorpalette_button_deny',
                     'colorpalette_button_settings',
-                    'colorpalette_buttons_border_radius',
+                    'buttons_border_radius',
 				);
 				$cats_pattern = '/data-category="(.*?)"/i';
 				if (isset($settings['categories'])) {

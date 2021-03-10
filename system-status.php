@@ -39,19 +39,12 @@ if ( current_user_can( 'manage_options' ) ) {
 
 	$settings = get_option( 'complianz_options_settings' );
 	echo "\n"."General settings" . "\n";
-	echo implode("\n", array_map(
-		function ($v, $k) { return sprintf("%s : %s", $k, $v); },
-		$settings,
-		array_keys($settings)
-	));
+	echo implode_array_recursive($settings);
 
 	$wizard   = get_option( 'complianz_options_wizard' );
 	echo "\n\n"."Wizard settings" . "\n";
-	echo implode("\n", array_map(
-		function ($v, $k) { return sprintf("%s : %s", $k, $v); },
-		$wizard,
-		array_keys($wizard)
-	));
+	$t = array_keys($wizard);
+	echo implode_array_recursive($wizard);
 	do_action( "cmplz_system_status" );
 
 	$content = ob_get_clean();
@@ -65,14 +58,12 @@ if ( current_user_can( 'manage_options' ) ) {
 	$file_name = 'complianz-system-status.txt';
 	header( "Content-type: application/octet-stream" );
 
-	//direct downloaden
+	//direct download
 	header( "Content-Disposition: attachment; filename=\"" . $file_name . "\"" );
 
 	//open in browser
-	//header("Content-Disposition: inline; filename=\"".$file_name."\"");
 	header( "Content-length: $fsize" );
 	header( "Cache-Control: private", false ); // required for certain browsers
-
 	header( "Pragma: public" ); // required
 	header( "Expires: 0" );
 	header( "Cache-Control: must-revalidate, post-check=0, pre-check=0" );
@@ -102,4 +93,27 @@ function find_wordpress_base_path() {
 		}
 	} while( $dir = realpath("$dir/..") );
 	return null;
+}
+
+/**
+ * Generate a readable string from an array
+ * @param array $array
+ *
+ * @return string
+ */
+
+function implode_array_recursive($array) {
+
+	return implode("\n", array_map(
+		function ($v, $k) {
+			if (is_array($v)){
+				$output = implode_array_recursive($v);
+			} else {
+				$output = sprintf("%s : %s", $k, $v);
+			}
+			return $output;
+		},
+		$array,
+		array_keys($array)
+	));
 }

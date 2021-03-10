@@ -10,7 +10,9 @@ jQuery(document).ready(function($) {
 				//var footer = this.container.closest()
 				this.totalPages = Math.ceil(this.items.length / this.perPage);
 				$('.cmplz-pagination', this.container.parent()).remove();
-				var pagination = $('<div class="cmplz-pagination"></div>').append('<a class="cmplz-nav cmplz-prev cmplz-disabled" data-next="false"><</a>');
+				var paging_prev_icon = $('.cmplz-paging-prev-icon').html();
+				var paging_next_icon = $('.cmplz-paging-next-icon').html();
+				var pagination = $('<div class="cmplz-pagination"></div>').append('<a class="cmplz-nav cmplz-prev cmplz-disabled" data-next="false">'+paging_prev_icon+'</a>');
 				for (var i = 0; i < this.totalPages; i++) {
 					var pageElClass = "cmplz-page";
 					if (!i)
@@ -20,7 +22,8 @@ jQuery(document).ready(function($) {
 						i + 1) + "</a>";
 					pagination.append(pageEl);
 				}
-				pagination.append('<a class="cmplz-nav cmplz-next" data-next="true">></a>');
+
+				pagination.append('<a class="cmplz-nav cmplz-next" data-next="true">'+paging_next_icon+'</a>');
 
 				this.container.find('.cmplz-footer-contents').append(pagination );
 

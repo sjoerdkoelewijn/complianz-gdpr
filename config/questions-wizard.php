@@ -214,10 +214,7 @@ $this->fields = $this->fields + array(
 			'source'             => 'wizard',
 			'type'               => 'multicheckbox',
 			'default'            => '',
-			'label'              => __( "Indicate for what purpose personal data is processed via your website:",
-				'complianz-gdpr' ),
-			'help'               => __( "Also consider future purposes. Regarding personalized products: these are products and/or services which are personalized based on visitor's behavior. E.g. advertisements based on pages visited.",
-				'complianz-gdpr' ).cmplz_read_more('https://complianz.io/purposes/'),
+			'label'              => __( "Indicate for what purpose personal data is processed via your website:", 'complianz-gdpr' ),
 			'required'           => true,
 			'options'            => $this->purposes,
 			'callback_condition' => array(
@@ -246,7 +243,7 @@ $this->fields = $this->fields + array(
 			'options' => $this->yes_no,
 			'default' => 'no',
 			'label' => __("Respect Do Not Track and Global Privacy Control with Premium", 'complianz-gdpr'),
-			'comment' => __('If you enable this option, Complianz will not show the cookie banner to users that enabled a ‘Do Not Track’ or \'Global Privacy Control\' setting in their browsers and their default consent status is set to ‘denied’.','complianz-gdpr'),
+			'tooltip' => __('If you enable this option, Complianz will not show the cookie banner to users that enabled a ‘Do Not Track’ or \'Global Privacy Control\' setting in their browsers and their default consent status is set to ‘denied’.','complianz-gdpr'),
 		),
 	);
 
@@ -260,7 +257,7 @@ $this->fields = $this->fields + array(
 			'default'   => '',
 			'options'   => $this->yes_no,
 			'label'     => __( "Do you consent to the use of the cookiedatabase.org API?", 'complianz-gdpr' ),
-			'comment'   => __( "Without the API, you will have to manually describe all found cookies, their purpose, function, service and service types",
+			'comment'   => __( "Without the API, you will have to manually describe all found cookies, their purpose, function, service and service types. ",
 				'complianz-gdpr' )
 		. sprintf( __( "Complianz provides your Cookie Policy with comprehensive cookie descriptions, supplied by %scookiedatabase.org%s. We connect to this open-source database using an external API, which sends the results of the cookiescan (a list of found cookies, used plugins and your domain) to cookiedatabase.org, for the sole purpose of providing you with accurate descriptions and keeping them up-to-date at a weekly schedule. For more information, read the %sPrivacy Statement%s",
 					'complianz-gdpr' ),
@@ -329,7 +326,7 @@ $this->fields = $this->fields + array(
 			'options'                 => array(
 				'accepted'             => __( 'I have accepted the Google data processing amendment', 'complianz-gdpr' ),
 				'no-sharing'           => __( 'Google is not allowed to use this data for other Google services', 'complianz-gdpr' ),
-				'ip-addresses-blocked' => __( 'I agree Complianz will anonymize user IP addresse', 'complianz-gdpr' ),
+				'ip-addresses-blocked' => __( 'Let Complianz anonymize IP addresses', 'complianz-gdpr' ),
 			),
 			'help'                    => __( 'If you do not check to let Complianz anonymize IP addresses, the IP addresses will get collected as soon as the user consents to the category statistics or higher.', 'complianz-gdpr' )
 			                             . cmplz_read_more( 'https://complianz.io/how-to-configure-google-analytics-for-gdpr/' ),
@@ -410,6 +407,7 @@ $this->fields = $this->fields + array(
 			'condition'               => array(
 				'regions' => 'eu',
 			),
+			'callback_condition' => 'cmplz_consent_required_for_anonymous_stats',
 		),
 
 		'configuration_by_complianz' => array(
@@ -421,7 +419,7 @@ $this->fields = $this->fields + array(
 			'label'              => __( "Do you want Complianz to configure your statistics?",
 				'complianz-gdpr' ),
 			'options'            => $this->yes_no,
-			'help'               => __( "It's recommended to let Complianz handle the statistics script. This way, the plugin can detect if it needs to be hooked into the cookie consent code or not. But if you have set it up yourself and don't want to change this, you can choose to do so",
+			'tooltip'               => __( "It's recommended to let Complianz handle the statistics script. This way, the plugin can detect if it needs to be hooked into the cookie consent code or not. But if you have set it up yourself and don't want to change this, you can choose to do so",
 				'complianz-gdpr' ),
 			'callback_condition' => 'cmplz_manual_stats_config_possible',
 		),
@@ -438,7 +436,7 @@ $this->fields = $this->fields + array(
 				'complianz-gdpr' ),
 			'callback_condition'      => array( 'compile_statistics' => 'google-tag-manager' ),
 			'condition'               => array( 'configuration_by_complianz' => 'yes' ),
-			'help'                    => __( "For the Google Tag Manager code, log on. Then, you will immediatly see Container codes. The one next to your website name is the code you will need to fill in here, the Container ID.",
+			'tooltip'                    => __( "For the Google Tag Manager code, log on. Then, you will immediatly see Container codes. The one next to your website name is the code you will need to fill in here, the Container ID.",
 				'complianz-gdpr' ),
 		),
 
@@ -514,8 +512,8 @@ $this->fields = $this->fields + array(
 				'complianz-gdpr' ),
 			'tooltip'      => __( "Checking services here will add the associated cookies to your Cookie Policy, and block the service until consent is given (opt-in), or after consent is revoked (opt-out).",
 				'complianz-gdpr' ),
-			'comment'   => __( "You can disable services and placeholders under Integrations.",
-					'complianz-gdpr' ),
+			'comment'   => __( "When possible a placeholder is activated. You can also disable or configure the placeholder to your liking. You can disable services and placeholders under Integrations.",
+					'complianz-gdpr' ) .'</br>' .cmplz_read_more( 'https://complianz.io/configuring-hotjar-for-gdpr/' ),
 		),
 
 		'block_recaptcha_service' => array(

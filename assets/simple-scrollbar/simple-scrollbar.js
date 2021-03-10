@@ -138,7 +138,7 @@
 		}
 	}
 
-	function initAll() {
+	function initScrollContainer() {
 		var nodes = d.querySelectorAll('.rsssl-scroll-container');
 
 		for (var i = 0; i < nodes.length; i++) {
@@ -154,9 +154,9 @@
 		}
 	}
 
-	d.addEventListener('DOMContentLoaded', initAll);
+	d.addEventListener('DOMContentLoaded', initScrollContainer);
 	ss.initEl = initEl;
-	ss.initAll = initAll;
+	ss.initScrollContainer = initScrollContainer;
 	ss.unbindEl = unbindEl;
 	ss.unbindAll = unbindAll;
 

@@ -250,8 +250,7 @@ jQuery(document).ready(function ($) {
 		});
 
 		//blocked images
-		var images = $('.cmplz-image');
-		images.each(function (i, obj) {
+		$('.cmplz-image').each(function (i, obj) {
 			if ( $(this).hasClass('cmplz-activated') ) return;
 			$(this).addClass('cmplz-activated' );
 
@@ -263,7 +262,6 @@ jQuery(document).ready(function ($) {
 			}
 		});
 
-		//iframes and video's
 		$('.cmplz-iframe').each(function (i, obj) {
 			if ( $(this).hasClass('cmplz-activated') ) return;
 			$(this).addClass('cmplz-activated' );
@@ -359,9 +357,11 @@ jQuery(document).ready(function ($) {
 				} else {
 					$.getScript(src)
 						.done(function (s, Status) {
+							var allScriptsExecuted = true;
 							//check if we have waiting scripts
 							var waitingScript = cmplzGetWaitingScript(waitingScripts, src);
 							if (waitingScript) {
+								allScriptsExecuted = false;
 								$.getScript(waitingScript).done(function (script, textStatus) {
 									cmplzRunAfterAllScripts();
 								}).fail(function (jqxhr, settings, exception) {
@@ -371,11 +371,12 @@ jQuery(document).ready(function ($) {
 
 							var waitingInlineScript = cmplzGetWaitingScript(waitingInlineScripts, src);
 							if (waitingInlineScript) {
+								allScriptsExecuted = false;
 								cmplzRunInlineScript(waitingInlineScript);
 							}
 
 							//maybe all scripts are already done
-							cmplzRunAfterAllScripts();
+							if (allScriptsExecuted) cmplzRunAfterAllScripts();
 						})
 						.fail(function (jqxhr, settings, exception) {
 							console.warn("Something went wrong " + exception);
@@ -388,18 +389,6 @@ jQuery(document).ready(function ($) {
 					return;
 				}
 				cmplzRunInlineScript($(this));
-				//get scripts that are waiting for this inline script
-				var waitingScript = cmplzGetWaitingScript(waitingScripts, $(this).text());
-				if (waitingScript !== false) {
-					$.getScript(waitingScript)
-						.done(function (s, Status) {
-							//maybe all scripts are already done
-							cmplzRunAfterAllScripts();
-						})
-						.fail(function (jqxhr, settings, exception) {
-							console.warn("Something went wrong " + exception);
-						});
-				}
 			}
 		});
 
@@ -431,15 +420,14 @@ jQuery(document).ready(function ($) {
 	function cmplzGetWaitingScript(waitingScripts, src) {
 		for (var waitfor in waitingScripts) {
 			var waitingScript;//recaptcha/api.js, waitfor="gregaptcha"
-
 			if (waitingScripts.hasOwnProperty(waitfor)) {
 				waitingScript = waitingScripts[waitfor];
-				if (typeof waitingScript !== 'string') waitingScript = waitingScript.text();
+				if (typeof waitingScript !== 'string') {
+					waitingScript = waitingScript.text();
+				}
 				if (src.indexOf(waitfor) !== -1) {
-
 					var output = waitingScripts[waitfor];
 					delete waitingScripts[waitfor];
-
 					return output;
 				}
 			}
@@ -488,10 +476,8 @@ jQuery(document).ready(function ($) {
 
 	function cmplzRunAfterAllScripts() {
 		if (!cmplzAllScriptsHookFired && cmplzArrayIsEmpty(waitingInlineScripts) && cmplzArrayIsEmpty(waitingScripts) ) {
-			//hook
 			var event = new CustomEvent( 'cmplzRunAfterAllScripts' );
 			document.dispatchEvent(event);
-
 			cmplzAllScriptsHookFired = true;
 		}
 	}
@@ -504,8 +490,23 @@ jQuery(document).ready(function ($) {
 	function cmplzRunInlineScript(script) {
 		$('<script>')
 			.attr('type', 'text/javascript')
-			.text(script.text())
-			.appendTo(script.parent());
+			.text(script.text()).appendTo(script.parent());
+
+		//get scripts that are waiting for this inline script
+		var waitingScript = cmplzGetWaitingScript(waitingScripts, script.text());
+		if (waitingScript !== false) {
+			$.getScript(waitingScript)
+				.done(function (s, Status) {
+					//maybe all scripts are already done
+					cmplzRunAfterAllScripts();
+				})
+				.fail(function (jqxhr, settings, exception) {
+					console.warn("Something went wrong " + exception);
+				});
+		} else {
+			cmplzRunAfterAllScripts();
+		}
+
 		script.remove();
 	}
 
@@ -742,11 +743,11 @@ jQuery(document).ready(function ($) {
 	/**
 	 * Disable auto dismiss options, when user has manually revoked the consent in optout regions
 	 */
+
 	function cmplzDisableAutoDismiss(){
 		complianz.dismiss_on_scroll = false;
 		complianz.dismiss_on_timeout = false;
 	}
-
 
 	/**
 	 * Run the actual cookie warning
@@ -814,10 +815,10 @@ jQuery(document).ready(function ($) {
 			save_button = '<a href="#" role="button" class="cc-btn cc-accept-all">{{accept_all}}</a>'+save_button;
 		}
 
-		var dismiss_button = '<a href="#" role="button" class="cc-btn cc-dismiss">{{dismiss}}</a>';
-		var allow_button = '<a href="#" role="button"  class="cc-btn cc-save cc-allow">{{allow}}</a>';
+		var dismiss_button = '<a href="#" role="button" role="button" class="cc-btn cc-dismiss">{{dismiss}}</a>';
+		var allow_button = '<a href="#" role="button" role="button" class="cc-btn cc-save cc-allow">{{allow}}</a>';
 		if (complianz.consenttype === 'optout' ) {
-			dismiss_button ='<a href="#" role="button" class="cc-btn cc-allow">{{dismiss}}</a>';
+			dismiss_button ='<a href="#" role="button" role="button" class="cc-btn cc-allow">{{dismiss}}</a>';
 		}
 
 		//to be able to hide the banner on the cookie policy
@@ -923,17 +924,17 @@ jQuery(document).ready(function ($) {
 				"popup": {
 					"background": complianz.colorpalette_background_color,
 					"text": complianz.colorpalette_text_color,
-                    "link": complianz.colorpalette_text_hyperlink,
-                    "border": complianz.border_color,
-                    "borderwidth": complianz.colorpalette_border_width,
+                    "link": complianz.colorpalette_text_hyperlink_color,
+                    "border": complianz.colorpalette_background_border,
+                    "borderwidth": complianz.border_width,
                     "borderradius": complianz.colorpalette_border_radius,
                     "boxshadow": complianz.box_shadow,
 				},
 				"button": {
 					"background": complianz.colorpalette_button_accept_color,
 					"text": complianz.colorpalette_button_accept_text,
-					"border": complianz.border_color,
-                    "borderradius": complianz.colorpalette_buttons_border_radius,
+					"border": complianz.colorpalette_button_accept_border,
+                    "borderradius": complianz.buttons_border_radius,
 				}
 			},
 			"theme": complianz.theme,
@@ -954,7 +955,7 @@ jQuery(document).ready(function ($) {
 				"allow": allow_button,
 				"save": save_button,
 				"categories-checkboxes": complianz.categories,
-				"messagelink": '<div class="cc-header">{{header}}</div>&nbsp;<div id="cookieconsent:desc" class="cc-message">{{message}} <a class="cc-link" href="{{href}}">{{link}}</a>' + complianz.privacy_link[complianz.region] + '</div>',
+				"messagelink": '<div class="cc-header">{{header}}</div><div id="cookieconsent:desc" class="cc-message">{{message}} <a class="cc-link" href="{{href}}">{{link}}</a>' + complianz.privacy_link[complianz.region] + '</div>',
 			},
 			"content": {
 				"save_preferences": complianz.save_preferences,
@@ -1657,7 +1658,6 @@ jQuery(document).ready(function ($) {
 		return output;
 	}
 
-
 	/**
 	 * If current cookie policy has changed, reset cookie consent
 	 *
@@ -1672,28 +1672,48 @@ jQuery(document).ready(function ($) {
 
 	/**
 	 * Clear all our own cookies, to make sure path issues are resolved.
+	 *
+	 *
 	 */
 	function cmplzClearAllComplianzCookies(){
+		var secure = ";secure";
+		var date = new Date();
+		date.setTime(date.getTime() - (24 * 60 * 60 * 1000));
+		var expires = ";expires=" + date.toGMTString();
+		if (window.location.protocol !== "https:") secure = '';
 		(function () {
 			var cookies = document.cookie.split("; ");
 			for (var c = 0; c < cookies.length; c++) {
 				var d = window.location.hostname.split(".");
+				//if we have more than one result in the array, we can skip the last one, as it will be the .com/.org extension
+				var skip_last = d.length > 1;
 				while (d.length > 0) {
 					var cookieName = cookies[c].split(";")[0].split("=")[0];
-					var cookieBase = encodeURIComponent(cookieName) + '=; expires=Thu, 01-Jan-1970 00:00:01 GMT; domain=' + d.join('.') + ' ;path=';
-					var p = location.pathname.split('/');
+					var p = location.pathname;
+					p = p.replace(/^\/|\/$/g, '').split('/');
 					if ( cookieName.indexOf('cmplz') !==-1 || cookieName.indexOf('complianz') !==-1) {
-						document.cookie = cookieBase + '/';
+						var cookieBase = encodeURIComponent(cookieName) + '=;SameSite=Lax' + secure + expires +';domain=.' + d.join('.') + ';path=';
+						var cookieBaseDomain = encodeURIComponent(cookieName) + '=;SameSite=Lax' + secure + expires +';domain=;path=';
+						document.cookie = cookieBaseDomain + '/';
+						document.cookie = cookieBase+ '/';
 						while (p.length > 0) {
-							document.cookie = cookieBase + p.join('/');
+							var path = p.join('/');
+							if ( path.length>0 ) {
+								document.cookie = cookieBase + '/' + path;
+								document.cookie = cookieBaseDomain + '/' + path;
+							}
 							p.pop();
 						};
 					}
-
 					d.shift();
+					//prevents setting cookies on .com/.org
+					if (skip_last && d.length==1) d.shift();
 				}
 			}
 		})();
+
+		//to prevent a double reload, we preserve the cookie policy id.
+		cmplzSetAcceptedCookiePolicyID();
 	}
 
 	/**

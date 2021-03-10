@@ -33,8 +33,8 @@ foreach ($docs as $doc) {
 			'status' => 'missing',
 			'title' => $doc['title'],
 			'page_exists' => '',
-			'sync_icon' => cmplz_icon( 'documents-sync', 'disabled' ),
-			'shortcode_icon' => cmplz_icon( 'documents-shortcode', 'disabled' ),
+			'sync_icon' => cmplz_icon( 'sync', 'disabled' ),
+			'shortcode_icon' => cmplz_icon( 'shortcode', 'disabled' ),
 			'generated' => '<a href="https://complianz.io" target="_blank">'.__("Premium","complianz-gdpr").'</a>',
 		);
 		echo cmplz_get_template('dashboard/documents-row.php', $args);
