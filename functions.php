@@ -1107,6 +1107,16 @@ if ( !function_exists('cmplz_uses_marketing_cookies') ) {
 	}
 }
 
+if (!function_exists('cmplz_dnsmpi_required')) {
+	/**
+	 * Check if the site requires DNSMPI logic
+	 *
+	 * @return bool
+	 */
+	function cmplz_dnsmpi_required() {
+		return cmplz_has_region( 'us' ) && cmplz_sells_personal_data();
+	}
+}
 if (!function_exists('cmplz_file_exists_on_url')) {
 	function cmplz_file_exists_on_url($url){
 		$uploads    = wp_upload_dir();
