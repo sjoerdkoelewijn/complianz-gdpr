@@ -8,7 +8,6 @@ function cmplz_elementor_initDomContentLoaded() {
 			jQuery(document).ready(function ($) {
 				$(document).on("cmplzRunAfterAllScripts", cmplz_elementor_fire_initOnReadyComponents);
 				function cmplz_elementor_fire_initOnReadyComponents() {
-					var cmplzElementor = $('[data-cmplz-elementor-settings]').length ? true : false;
 					$('[data-cmplz-elementor-settings]').each(function (i, obj) {
 						if ( $(this).hasClass('cmplz-activated') ) return;
 						$(this).addClass('cmplz-activated' );
@@ -22,12 +21,18 @@ function cmplz_elementor_initDomContentLoaded() {
 							blockedContentContainer.removeClass('cmplz-placeholder-' + cssIndex);
 						});
 					});
-					if ( cmplzElementor ) window.elementorFrontend.init();
+					//if ( cmplzElementor ) window.elementorFrontend.init();
+				}
 
+				$(document).on("cmplzStatusChange", cmplz_elementor_fire_initOnChange);
+				function cmplz_elementor_fire_initOnChange() {
+					var cmplzElementor = $('[data-cmplz-elementor-settings]').length ? true : false;
+					//if ( cmplzElementor ) window.elementorFrontend.init();
+					if ( cmplzElementor ) window.location.reload();
 				}
 			})
 		</script>
-	<?php
+		<?php
 	}
 }
 add_action( 'wp_footer', 'cmplz_elementor_initDomContentLoaded' );
